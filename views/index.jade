@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  // script.
+  //   var symbol = !{JSON.stringify(symbol)};
+  #content
+  div.container
+    h1= title
+    p Log a new entry
+    div.row
+      div.col-md-6
+        form#form.form-horizontal(role='form', action='/', method='post')
+          div#fields
+            div.form-group
+              input#field.form-control(name='text')
+          div#submit
+            div.form-group
+              div.col-sm-offset-10.col-sm-2
+                button.btn.btn-default#submit(type="submit", onclick="submitForm();") submit
+      div.col-md-6
+
