@@ -1,6 +1,13 @@
 var Entry = require('mongoose').model('EntrySchema');
 var User = require('mongoose').model('UserSchema');
 
+Array.prototype.contains = function(k) {
+  for (p in this)
+     if (this[p] === k)
+        return true;
+  return false;
+}
+
 function renderMain(res) {
   res.render('index', {
     title: 'Wake UP',
@@ -28,6 +35,19 @@ exports.submit = function(req, res) {
 
     // add posted entry to db
     if (user) {
+      console.log(user.symbol.names);
+      if (!user.symbol.names.contains(type)) {
+        user.symbol.names.push(type);
+        console.log('pushed new type');
+        var tmp = new Array();
+        for(var name in data) {
+          // var value = data[name];
+          tmp.push(name);
+        }
+        user.symbol.types[type] = tmp;
+        console.log(user.symbol.types);
+      }
+
       user.entries.push(entry);
       user.save(function (err) {
         if (!err) {
