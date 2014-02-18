@@ -1,18 +1,3 @@
-// var symbol = {
-//   types: {
-//     'judgment': ['toward', 'trigger', 'reason'],
-//     'reaction': ['toward', 'trigger', 'reason'],
-//     'intention': ['to', 'by', 'because']
-//   },
-//   names: [
-//     'judgment',
-//     'reaction',
-//     'intention'
-//   ]
-// };
-
-var next = 0;
-
 function newInput(arg) {
   var inputID = arg + '-id';
   var rowID = arg + '-row-id'
@@ -28,7 +13,9 @@ function newInput(arg) {
   '</div>';
 }
 
-function newField(arg) {
+function newField() {
+  if ($('#new').length)
+    return;
   $('#inner').append('' +
     '<div id="new-holder" class="form-group">' +
       '<input type="text" class="form-control" id="new" placeholder="Enter new field name">' +
@@ -38,15 +25,22 @@ function newField(arg) {
     .bind('keydown', function(event) {
       if (event.keyCode === 13) {
         event.preventDefault();
-        $(newInput($('#new').val())).insertBefore('#new-holder');
-        $('#new').val('');
+        var newInputName = $('#new').val();
+
+        if (newInputName != '') {
+          $(newInput(newInputName)).insertBefore('#new-holder');
+          $('#new').val('');
+          $('#' + newInputName + '-id').focus();
+        }
       }
     });
 }
 
 function submitForm() {
-  $('#form').submit();
+  $('#form-submit').submit();
 }
+
+var selectCalled = false;
 
 $().ready(function() {
 
@@ -69,7 +63,7 @@ $().ready(function() {
   function autocomplete(symbol) {
     var availableTags = symbol.names;
 
-    $("#field")
+    $("#type-input")
       .autocomplete({
         position: {my: "left top", at: "right top"},
         minLength: 0,
@@ -78,17 +72,28 @@ $().ready(function() {
           response($.ui.autocomplete.filter(availableTags, extractLast(request.term)));
         },
         select: function(event, ui) {
+          selectCalled = true;
+
           var val = ui.item.value;
           var attrs = symbol.types[val];
-          var div = document.createElement('div');
-          div.class = 'inner';
-          div.id = 'inner';
-          $('#fields').append(div);
-          // div.insertBefore('#submit');
-          for (var i = 0; i < attrs.length; i++) {
-            $('#inner').append(newInput(attrs[i]));
-          };
-          newField();
+
+          if (attrs) {
+            for (var i = 0; i < attrs.length; i++) {
+              $('#inner')
+                .append(newInput(attrs[i]));
+                // .bind('keydown', function(event) {
+                //   if (event.keyCode === 13) {
+                //     event.preventDefault();
+
+                //   }
+                // });
+            }
+            $('#' + attrs[0] + '-id').focus();
+            console.log('should have focused');
+          }
+          if ($('#type-input').val() != '') {
+            newField();
+          }
           var joined = attrs.join(':\n\t');
           this.value = val + ': {\n\t' + joined + '\n}';
           this.value = val;
@@ -97,6 +102,20 @@ $().ready(function() {
       })
       .focus(function() {
         $(this).autocomplete("search", "");
+      })
+      .bind('keydown', function(event) {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          // if (! $( this ).data( "ui-autocomplete" ).menu.active) {
+          if (!selectCalled) {
+            var typeValue = $('#type-input').val();
+            if (typeValue != '') {
+              newField();
+              $('#new').focus();
+              console.log('focusing on new');
+            }
+          }
+        }
       });
       // .bind( "keydown", function( event ) {
       //     if ( event.keyCode === $.ui.keyCode.TAB &&

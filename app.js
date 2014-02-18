@@ -3,12 +3,6 @@
  * Module dependencies.
  */
 
-// var express = require('express')
-//   , routes = require('./routes')
-//   , user = require('./routes/user')
-//   , http = require('http')
-//   , path = require('path');
-
 var express = require('express')
   , db = require('./model/db')
   , routes = require('./routes')
@@ -37,16 +31,6 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.post('/', routes.submit);
-app.get('/data', routes.data);
-// app.post('/submit', function(req, res) {
-//   console.log(routes);
-
-//   var data = req.body;
-//   console.log("POSTED");
-//   console.log(data);
-// });
-
-// app.get('/users', user.list);
 app.get('/data', routes.data);
 
 http.createServer(app).listen(app.get('port'), function(){

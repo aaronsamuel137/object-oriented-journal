@@ -16,7 +16,29 @@ function renderMain(res) {
   });
 }
 
-exports.index = function(req, res){
+function deleteEntry() {
+  User.find({ name: 'aaron' }).remove(function() {
+    console.log('removed');
+  });
+}
+
+function addUser(name, password) {
+  var symbol = {
+    types: {},
+    names: []
+  }
+  var user = new User({ name: name, password: password, symbol: symbol, entries: [] });
+  console.log('new user: ' + user.id);
+  user.save( function (err) {
+    if (err)
+      return;
+    console.log('Saved');
+  });
+}
+
+exports.index = function(req, res) {
+  // deleteEntry();
+  // addUser('aaron', 'hello');
   renderMain(res);
 };
 
@@ -32,10 +54,10 @@ exports.submit = function(req, res) {
   // retrieve user from database
   var name = "aaron";
   User.findOne({name: name}, function (err, user) {
+    console.log(user);
 
     // add posted entry to db
     if (user) {
-      console.log(user.symbol.names);
       if (!user.symbol.names.contains(type)) {
         user.symbol.names.push(type);
         console.log('pushed new type');
@@ -44,8 +66,12 @@ exports.submit = function(req, res) {
           // var value = data[name];
           tmp.push(name);
         }
-        user.symbol.types[type] = tmp;
-        console.log(user.symbol.types);
+        if (user.symbol.types) {
+          user.symbol.types[type] = tmp;
+        } else {
+          user.symbol.types = {};
+          user.symbol.types[type] = tmp;
+        }
       }
 
       user.entries.push(entry);
