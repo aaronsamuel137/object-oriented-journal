@@ -16,6 +16,7 @@ var EntrySchema = new mongoose.Schema({
   data: {}
 });
 
+
 mongoose.model('UserSchema', UserSchema);
 mongoose.model('EntrySchema', EntrySchema);
 

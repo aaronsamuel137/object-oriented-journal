@@ -1,3 +1,5 @@
+var selectCalled = false; // set to true if autocomplete's select is called
+
 function newInput(arg) {
   var inputID = arg + '-id';
   var rowID = arg + '-row-id'
@@ -14,13 +16,18 @@ function newInput(arg) {
 }
 
 function newField() {
-  if ($('#new').length)
+  if ($('#new').length) { // new input already exists, and we only want one existing
     return;
+  }
+
+  // append new input field
   $('#inner').append('' +
     '<div id="new-holder" class="form-group">' +
       '<input type="text" class="form-control" id="new" placeholder="Enter new field name">' +
     '</div>'
   );
+
+  // capture enter key for new input field
   $('#new')
     .bind('keydown', function(event) {
       if (event.keyCode === 13) {
@@ -40,7 +47,6 @@ function submitForm() {
   $('#form-submit').submit();
 }
 
-var selectCalled = false;
 
 $().ready(function() {
 
@@ -106,7 +112,7 @@ $().ready(function() {
       .bind('keydown', function(event) {
         if (event.keyCode === 13) {
           event.preventDefault();
-          // if (! $( this ).data( "ui-autocomplete" ).menu.active) {
+
           if (!selectCalled) {
             var typeValue = $('#type-input').val();
             if (typeValue != '') {

@@ -3,8 +3,8 @@ var User = require('mongoose').model('UserSchema');
 
 Array.prototype.contains = function(k) {
   for (p in this)
-     if (this[p] === k)
-        return true;
+    if (this[p] === k)
+      return true;
   return false;
 }
 
@@ -39,6 +39,10 @@ function addUser(name, password) {
 exports.index = function(req, res) {
   // deleteEntry();
   // addUser('aaron', 'hello');
+  User.find({name: 'aaron'}, function (err, user) {
+    console.log('user is:\n %j', user);
+  });
+
   renderMain(res);
 };
 
@@ -55,14 +59,21 @@ exports.submit = function(req, res) {
   var name = "aaron";
   User.findOne({name: name}, function (err, user) {
     console.log(user);
+    console.log(type);
 
     // add posted entry to db
     if (user) {
+      console.log('names are: ' + user.symbol.names);
+
+      // if a new name is added, update the symbol object
       if (!user.symbol.names.contains(type)) {
         user.symbol.names.push(type);
-        console.log('pushed new type');
+        console.log('pushed new name');
+      }
+
+      if (!user.symbol.types.hasOwnProperty(type)) {
         var tmp = new Array();
-        for(var name in data) {
+        for (var name in data) {
           // var value = data[name];
           tmp.push(name);
         }
@@ -72,12 +83,27 @@ exports.submit = function(req, res) {
           user.symbol.types = {};
           user.symbol.types[type] = tmp;
         }
+        console.log('added new type');
       }
 
+      for (var name in data) {
+        if (!user.symbol.types[type].contains(name)) {
+          user.symbol.types[type].push(name);
+          console.log('pushing new name ' + name + ' into type object');
+        } else {
+          console.log('didnt push ' + name)
+        }
+      }
+
+      user.markModified('symbol.types');
+      user.markModified('symbol.names');
+
+      console.log('user is:\n %j', user.symbol);
+
       user.entries.push(entry);
-      user.save(function (err) {
+      user.save(function (err, doc) {
         if (!err) {
-          console.log('Entry added successfully.');
+          console.log('Entry added successfully.\n %j', doc.symbol);
         } else {
           console.log("Mongoose couldn't save entry: " + err);
         }
