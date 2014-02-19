@@ -1,5 +1,13 @@
 var selectCalled = false; // set to true if autocomplete's select is called
 
+jQuery.fn.extend({
+  disable: function(state) {
+    return this.each(function() {
+      this.disabled = state;
+    });
+  }
+});
+
 function newInput(arg) {
   var inputID = arg + '-id';
   var rowID = arg + '-row-id'
@@ -30,7 +38,7 @@ function newField() {
   // capture enter key for new input field
   $('#new')
     .bind('keydown', function(event) {
-      if (event.keyCode === 13) {
+      if (event.keyCode === 13 || event.keyCode === 9) {
         event.preventDefault();
         var newInputName = $('#new').val();
 
@@ -86,16 +94,17 @@ $().ready(function() {
           if (attrs) {
             for (var i = 0; i < attrs.length; i++) {
               $('#inner')
-                .append(newInput(attrs[i]));
-                // .bind('keydown', function(event) {
-                //   if (event.keyCode === 13) {
-                //     event.preventDefault();
-
-                //   }
-                // });
+                .append(newInput(attrs[i]))
+                .bind('keydown', function(event) {
+                  if (event.keyCode === 13) {
+                    // event.preventDefault();
+                    $('#' + attrs[i] + '-id').focus();
+                  }
+                });
             }
-            $('#' + attrs[0] + '-id').focus();
+            // $('#' + attrs[0] + '-id').focus();
             console.log('should have focused');
+            $('#type-input').prop('readonly', true);
           }
           if ($('#type-input').val() != '') {
             newField();
@@ -110,7 +119,7 @@ $().ready(function() {
         $(this).autocomplete("search", "");
       })
       .bind('keydown', function(event) {
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13 || event.keyCode === 9) {
           event.preventDefault();
 
           if (!selectCalled) {
@@ -118,6 +127,8 @@ $().ready(function() {
             if (typeValue != '') {
               newField();
               $('#new').focus();
+              // .disabled(true);
+              $('#type-input').prop('readonly', true);
               console.log('focusing on new');
             }
           }

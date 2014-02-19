@@ -51,6 +51,8 @@ exports.submit = function(req, res) {
   // get parameters and create entry object
   var data = req.body;
   var type = data.type;
+  console.log('data is %j', data);
+
   delete data.type;
   console.log(data);
   var entry = new Entry({ type: type , date: new Date(), data: data });
@@ -69,20 +71,20 @@ exports.submit = function(req, res) {
       if (!user.symbol.names.contains(type)) {
         user.symbol.names.push(type);
         console.log('pushed new name');
-      }
 
-      if (!user.symbol.types.hasOwnProperty(type)) {
-        var tmp = new Array();
-        for (var name in data) {
-          // var value = data[name];
-          tmp.push(name);
-        }
-        if (user.symbol.types) {
-          user.symbol.types[type] = tmp;
-        } else {
-          user.symbol.types = {};
-          user.symbol.types[type] = tmp;
-        }
+        user.symbol.types = {};
+        user.symbol.types[type] = [];
+        // var tmp = new Array();
+        // for (var name in data) {
+        //   // var value = data[name];
+        //   tmp.push(name);
+        // }
+        // if (user.symbol.types) {
+        //   user.symbol.types[type] = tmp;
+        // } else {
+        //   user.symbol.types = {};
+        //   user.symbol.types[type] = tmp;
+        // }
         console.log('added new type');
       }
 
@@ -95,8 +97,8 @@ exports.submit = function(req, res) {
         }
       }
 
-      user.markModified('symbol.types');
-      user.markModified('symbol.names');
+      user.markModified('symbol');
+      // user.markModified('symbol.names');
 
       console.log('user is:\n %j', user.symbol);
 
