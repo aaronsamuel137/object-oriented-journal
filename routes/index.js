@@ -51,10 +51,9 @@ exports.submit = function(req, res) {
   // get parameters and create entry object
   var data = req.body;
   var type = data.type;
-  console.log('data is %j', data);
-
   delete data.type;
-  console.log(data);
+
+  console.log('data is %j', data);
   var entry = new Entry({ type: type , date: new Date(), data: data });
 
   // retrieve user from database
@@ -72,7 +71,9 @@ exports.submit = function(req, res) {
         user.symbol.names.push(type);
         console.log('pushed new name');
 
-        user.symbol.types = {};
+        if (!user.symbol.types) {
+          user.symbol.types = {};
+        }
         user.symbol.types[type] = [];
         // var tmp = new Array();
         // for (var name in data) {

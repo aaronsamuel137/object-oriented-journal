@@ -9,8 +9,8 @@ jQuery.fn.extend({
 });
 
 function newInput(arg) {
-  var inputID = arg + '-id';
-  var rowID = arg + '-row-id'
+  var inputID = toID(arg);
+  var rowID = toRowID(arg);
   return '' +
   '<div id="' + rowID + '" class="form-group">' +
     '<label class="col-sm-2 control-label" for="' + inputID + '">' + arg + '</label>' +
@@ -45,7 +45,7 @@ function newField() {
         if (newInputName != '') {
           $(newInput(newInputName)).insertBefore('#new-holder');
           $('#new').val('');
-          $('#' + newInputName + '-id').focus();
+          $('#' + toID(newInputName)).focus();
         }
       }
     });
@@ -55,6 +55,13 @@ function submitForm() {
   $('#form-submit').submit();
 }
 
+function toID(string) {
+  return string.replace(/\s+/, '') + '-id';
+}
+
+function toRowID(string) {
+  return string.replace(/\s+/, '') + '-row-id';
+}
 
 $().ready(function() {
 
@@ -90,19 +97,31 @@ $().ready(function() {
 
           var val = ui.item.value;
           var attrs = symbol.types[val];
+          console.log(attrs);
 
           if (attrs) {
-            for (var i = 0; i < attrs.length; i++) {
-              $('#inner')
-                .append(newInput(attrs[i]))
-                .bind('keydown', function(event) {
-                  if (event.keyCode === 13) {
-                    // event.preventDefault();
-                    $('#' + attrs[i] + '-id').focus();
-                  }
-                });
+
+            var bindEm = function(attrs, i) {
+              console.log('binding ' + attrs[i]);
+              $('#' + toID(attrs[i])).bind('keydown', function(event) {
+                if (event.keyCode === 13) {
+                  event.preventDefault();
+                  console.log('pressed enter in %s', attrs[i]);
+                  if (attrs[i+1])
+                    $('#' + toID(attrs[i+1])).focus();
+                  else
+                    $('#new').focus();
+                }
+              });
             }
-            // $('#' + attrs[0] + '-id').focus();
+
+            for (var i = 0; i < attrs.length; i++) {
+              $('#inner').append(newInput(attrs[i]));
+              console.log(attrs[i]);
+              bindEm(attrs, i);
+            }
+
+            $('#' + toID(attrs[0])).focus();
             console.log('should have focused');
             $('#type-input').prop('readonly', true);
           }
