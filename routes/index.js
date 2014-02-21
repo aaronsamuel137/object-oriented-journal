@@ -1,8 +1,10 @@
-var Entry = require('mongoose').model('EntrySchema');
-var User = require('mongoose').model('UserSchema');
+var mongoose = require('mongoose')
+var Entry = mongoose.model('Entry');
+var User = mongoose.model('User');
+var ObjectId = mongoose.Types.ObjectId;
+
 var pg = require('pg');
 var connectionString = "/tmp wakeup";
-// var connectionString = "/tmp/.s.PGSQL.5432 wakeup";
 
 Array.prototype.contains = function(k) {
   for (p in this)
@@ -11,11 +13,11 @@ Array.prototype.contains = function(k) {
   return false;
 }
 
-function renderMain(res, name) {
+function renderMain(req, res) {
   res.render('index', {
     title: 'Wake UP',
     pagetitle: 'Wake UP',
-    name: name,
+    name: req.session.name,
     scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js', '/js/complete.js']
   });
 }
@@ -26,7 +28,8 @@ function deleteEntry() {
   });
 }
 
-function addUser(req_data) {
+function addUser(req) {
+  var req_data = req.body;
 
   // add user to mongodb
   var symbol = {
@@ -61,7 +64,10 @@ function addUser(req_data) {
           if (err) {
             console.log('query error: ' + err);
           } else {
-            console.log('result of insert ' + result);
+            console.log('result of insert %j', result);
+            req.session.name = req_data.name;
+            req.session.mongo_id = mongo_id;
+            renderMain()
           }
           done();
         }
@@ -166,9 +172,9 @@ exports.loginPost = function(req, res) {
             console.log(err);
           }
           console.log('results are %j', result);
-          var name = result.rows[0].name;
-          var mongo_id = result.rows[0].mongo_id;
-          renderMain(res, name);
+          req.session.name = result.rows[0].name;
+          req.session.mongo_id = result.rows[0].mongo_id;
+          renderMain(req, res);
           done();
         }
       );
@@ -177,13 +183,21 @@ exports.loginPost = function(req, res) {
 }
 
 exports.signup = function(req, res) {
-  var data = req.body;
-  addUser(data);
-  res.send('success!');
+  // var data = req.body;
+  addUser(req);
+  // res.send('success!');
 }
 
 exports.data = function(req, res) {
-  User.findOne({name: 'Aaron'}, function (err, user) {
-    res.send(user.symbol);
+  var mongo_id = new ObjectId(req.session.mongo_id);
+  console.log(mongo_id);
+  console.log(req.session.name);
+  User.findOne({"_id": mongo_id}, function (err, user) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('user is %j', user);
+      res.send(user.symbol);
+    }
   });
 }
