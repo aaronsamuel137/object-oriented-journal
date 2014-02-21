@@ -1,5 +1,8 @@
 var Entry = require('mongoose').model('EntrySchema');
 var User = require('mongoose').model('UserSchema');
+var pg = require('pg');
+var connectionString = "/tmp wakeup";
+// var connectionString = "/tmp/.s.PGSQL.5432 wakeup";
 
 Array.prototype.contains = function(k) {
   for (p in this)
@@ -8,10 +11,11 @@ Array.prototype.contains = function(k) {
   return false;
 }
 
-function renderMain(res) {
+function renderMain(res, name) {
   res.render('index', {
     title: 'Wake UP',
     pagetitle: 'Wake UP',
+    name: name,
     scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js', '/js/complete.js']
   });
 }
@@ -22,17 +26,47 @@ function deleteEntry() {
   });
 }
 
-function addUser(name, password) {
+function addUser(req_data) {
+
+  // add user to mongodb
   var symbol = {
     types: {},
     names: []
   }
-  var user = new User({ name: name, password: password, symbol: symbol, entries: [] });
+  var user = new User({ name: req_data.username, symbol: symbol, entries: [] });
+  var mongo_id = user.id;
   console.log('new user: ' + user.id);
   user.save( function (err) {
     if (err)
       return;
     console.log('Saved');
+  });
+
+  // add user to postgres
+  console.log('about to add to pg');
+  pg.connect(connectionString, function(err, client, done) {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query(
+        'INSERT INTO users (name, email, password, created_at, mongo_id) VALUES ($1, $2, $3, $4, $5);',
+        [
+          req_data.username,
+          req_data.email,
+          req_data.password,
+          new Date(),
+          mongo_id
+        ],
+        function(err, result) {
+          if (err) {
+            console.log('query error: ' + err);
+          } else {
+            console.log('result of insert ' + result);
+          }
+          done();
+        }
+      );
+    }
   });
 }
 
@@ -75,17 +109,6 @@ exports.submit = function(req, res) {
           user.symbol.types = {};
         }
         user.symbol.types[type] = [];
-        // var tmp = new Array();
-        // for (var name in data) {
-        //   // var value = data[name];
-        //   tmp.push(name);
-        // }
-        // if (user.symbol.types) {
-        //   user.symbol.types[type] = tmp;
-        // } else {
-        //   user.symbol.types = {};
-        //   user.symbol.types[type] = tmp;
-        // }
         console.log('added new type');
       }
 
@@ -99,7 +122,6 @@ exports.submit = function(req, res) {
       }
 
       user.markModified('symbol');
-      // user.markModified('symbol.names');
 
       console.log('user is:\n %j', user.symbol);
 
@@ -118,8 +140,50 @@ exports.submit = function(req, res) {
   });
 };
 
+exports.login = function(req, res) {
+  // deleteEntry();
+  res.render('login', {
+    title: 'Wake UP',
+    pagetitle: 'Log in',
+    scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js']
+  });
+}
+
+exports.loginPost = function(req, res) {
+  var req_data = req.body;
+  pg.connect(connectionString, function(err, client, done) {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query(
+        'SELECT name, mongo_id FROM users WHERE email = $1 AND password = $2',
+        [
+          req_data.email,
+          req_data.password,
+        ],
+        function(err, result) {
+          if (err) {
+            console.log(err);
+          }
+          console.log('results are %j', result);
+          var name = result.rows[0].name;
+          var mongo_id = result.rows[0].mongo_id;
+          renderMain(res, name);
+          done();
+        }
+      );
+    }
+  });
+}
+
+exports.signup = function(req, res) {
+  var data = req.body;
+  addUser(data);
+  res.send('success!');
+}
+
 exports.data = function(req, res) {
-  User.findOne({name: 'aaron'}, function (err, user) {
+  User.findOne({name: 'Aaron'}, function (err, user) {
     res.send(user.symbol);
   });
 }
