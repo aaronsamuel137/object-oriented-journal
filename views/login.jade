@@ -1,0 +1,40 @@
+extends layout
+
+block content
+  #content
+  div.container
+    h1= title
+    p !{message}
+    div.row
+      div.col-md-5
+        div.border-form
+          h3 Log In
+          form#login-form.form-horizontal(role='form', action='/login', method='post')
+            div.form-group
+              label(for='user-input') Email
+              input#email-input.form-control(name='email', type='email')
+            div.form-group
+              label(for='user-input') Password
+              input#email-input.form-control(name='password', type='password')
+            button.btn.btn-default#submit-button(type="submit") submit
+      div.col-md-2
+      div.col-md-5
+        div.border-form
+          h3 Sign Up
+          form#singup-form.form-horizontal(role='form', action='/signup', method='post')
+            div.form-group
+              label(for='user-input') Name
+              input#user-input.form-control(name='username', type='text')
+            div.form-group
+              label(for='user-input') Email
+              input#email-input.form-control(name='email', type='email')
+            div.form-group
+              label(for='user-input') Password
+              input#email-input.form-control(name='password', type='password')
+            div.form-group
+              label(for='user-input') Repeat Password
+              input#email-input.form-control(name='repeat', type='password')
+            button.btn.btn-default#submit-button(type="submit") submit
+
+
+

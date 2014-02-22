@@ -1,4 +1,4 @@
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
 var Entry = mongoose.model('Entry');
 var User = mongoose.model('User');
 var ObjectId = mongoose.Types.ObjectId;
@@ -7,11 +7,11 @@ var pg = require('pg');
 var connectionString = "/tmp wakeup";
 
 Array.prototype.contains = function(k) {
-  for (p in this)
+  for (var p in this)
     if (this[p] === k)
       return true;
   return false;
-}
+};
 
 function renderMain(req, res) {
   res.render('index', {
@@ -19,6 +19,15 @@ function renderMain(req, res) {
     pagetitle: 'Wake UP',
     name: req.session.name,
     scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js', '/js/complete.js']
+  });
+}
+
+function renderLogin(res, msg) {
+  res.render('login', {
+    title: 'Wake UP',
+    pagetitle: 'Log in',
+    message: msg,
+    scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js']
   });
 }
 
@@ -35,7 +44,7 @@ function addUser(req) {
   var symbol = {
     types: {},
     names: []
-  }
+  };
   var user = new User({ name: req_data.username, symbol: symbol, entries: [] });
   var mongo_id = user.id;
   console.log('new user: ' + user.id);
@@ -67,7 +76,7 @@ function addUser(req) {
             console.log('result of insert %j', result);
             req.session.name = req_data.name;
             req.session.mongo_id = mongo_id;
-            renderMain()
+            renderMain();
           }
           done();
         }
@@ -123,7 +132,7 @@ exports.submit = function(req, res) {
           user.symbol.types[type].push(name);
           console.log('pushing new name ' + name + ' into type object');
         } else {
-          console.log('didnt push ' + name)
+          console.log('didnt push ' + name);
         }
       }
 
@@ -147,13 +156,9 @@ exports.submit = function(req, res) {
 };
 
 exports.login = function(req, res) {
-  // deleteEntry();
-  res.render('login', {
-    title: 'Wake UP',
-    pagetitle: 'Log in',
-    scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js']
-  });
-}
+  var msg = 'Log in with your email and password, or create a new account';
+  renderLogin(res, msg);
+};
 
 exports.loginPost = function(req, res) {
   var req_data = req.body;
@@ -170,23 +175,28 @@ exports.loginPost = function(req, res) {
         function(err, result) {
           if (err) {
             console.log(err);
+          } else if (result.rowCount === 0) {
+            var msg = 'Email address/password combination not found<br>' +
+                      'Try again or create a new account';
+            renderLogin(res, msg);
+          } else {
+            console.log('results are %j', result);
+            req.session.name = result.rows[0].name;
+            req.session.mongo_id = result.rows[0].mongo_id;
+            renderMain(req, res);
+            done();
           }
-          console.log('results are %j', result);
-          req.session.name = result.rows[0].name;
-          req.session.mongo_id = result.rows[0].mongo_id;
-          renderMain(req, res);
-          done();
         }
       );
     }
   });
-}
+};
 
 exports.signup = function(req, res) {
   // var data = req.body;
   addUser(req);
   // res.send('success!');
-}
+};
 
 exports.data = function(req, res) {
   var mongo_id = new ObjectId(req.session.mongo_id);
@@ -200,4 +210,4 @@ exports.data = function(req, res) {
       res.send(user.symbol);
     }
   });
-}
+};
