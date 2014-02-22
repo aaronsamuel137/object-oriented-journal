@@ -37,7 +37,7 @@ function deleteEntry() {
   });
 }
 
-function addUser(req) {
+function addUser(req, res) {
   var req_data = req.body;
 
   // add user to mongodb
@@ -76,7 +76,7 @@ function addUser(req) {
             console.log('result of insert %j', result);
             req.session.name = req_data.name;
             req.session.mongo_id = mongo_id;
-            renderMain();
+            renderMain(req, res);
           }
           done();
         }
@@ -193,9 +193,28 @@ exports.loginPost = function(req, res) {
 };
 
 exports.signup = function(req, res) {
-  // var data = req.body;
-  addUser(req);
-  // res.send('success!');
+  var email_re = /\S+@\S+\.\S+/;
+  var data = req.body;
+  var msg;
+  if (data.username.length < 1) {
+    msg = 'Invalid username, must be at least 1 character long';
+    renderLogin(res, msg);
+  }
+  else if (!email_re.test(data.email)) {
+    msg = 'Invalid email, try again';
+    renderLogin(res, msg);
+  }
+  else if (data.password.length < 5) {
+    msg = 'Invalid password, must be at least 5 characters';
+    renderLogin(res, msg);
+  }
+  else if (data.password !== data.repeat) {
+    msg = 'Passwords do not match';
+    renderLogin(res, msg);
+  }
+  else {
+    addUser(req, res);
+  }
 };
 
 exports.data = function(req, res) {
