@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 // mongo schemas
 var UserSchema = new mongoose.Schema({
   name: String,
-  password: String,
   symbol: {
     types: {},
     names: []

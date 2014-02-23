@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Entry = mongoose.model('Entry');
 var User = mongoose.model('User');
 var ObjectId = mongoose.Types.ObjectId;
+var url = require('url');
 
 var pg = require('pg');
 var connectionString = "/tmp wakeup"; // where the sockect connection is to postgres
@@ -28,12 +29,6 @@ function renderLogin(res, msg) {
     pagetitle: 'Log in',
     message: msg,
     scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js']
-  });
-}
-
-function deleteEntry() {
-  User.find({ name: 'aaron' }).remove(function() {
-    console.log('removed');
   });
 }
 
@@ -154,8 +149,12 @@ exports.submit = function(req, res) {
 };
 
 exports.login = function(req, res) {
-  var msg = 'Log in with your email and password, or create a new account';
-  renderLogin(res, msg);
+  if (req.session.name) {
+    res.redirect('/');
+  } else {
+    var msg = 'Log in with your email and password, or create a new account';
+    renderLogin(res, msg);
+  }
 };
 
 exports.loginPost = function(req, res) {
@@ -216,16 +215,40 @@ exports.signup = function(req, res) {
   }
 };
 
+// json endpoint for getting user data
 exports.data = function(req, res) {
   var mongo_id = new ObjectId(req.session.mongo_id);
-  console.log(mongo_id);
-  console.log(req.session.name);
   User.findOne({"_id": mongo_id}, function (err, user) {
     if (err) {
       console.log(err);
     } else {
       console.log('user is %j', user);
       res.send(user.symbol);
+    }
+  });
+};
+
+exports.similarEntries = function(req, res) {
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  var mongo_id = new ObjectId(req.session.mongo_id);
+
+  User.findOne({"_id": mongo_id}, function (err, user) {
+    if (err) {
+      console.log('error: %s', err);
+    } else {
+      if (user.entries) {
+        var queriedEntries = [];
+        user.entries.forEach(function(entry) {
+          if (entry.type === query.type) {
+            queriedEntries.push(entry);
+          }
+          console.log('entry: %j', entry);
+          res.send(queriedEntries);
+        });
+      } else {
+        res.send('');
+      }
     }
   });
 };

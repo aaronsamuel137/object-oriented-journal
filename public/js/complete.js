@@ -38,7 +38,7 @@ function newField() {
   // capture enter key for new input field
   $('#new')
     .bind('keydown', function(event) {
-      if (event.keyCode === 13 || event.keyCode === 9) {
+      if (event.keyCode === 13) {
         event.preventDefault();
         var newInputName = $('#new').val();
 
@@ -46,6 +46,11 @@ function newField() {
           $(newInput(newInputName)).insertBefore('#new-holder');
           $('#new').val('');
           $('#' + toID(newInputName)).focus();
+          $('#' + toID(newInputName)).bind('keydown', function(event) {
+            if (event.keyCode === 13) {
+              $('#new').focus();
+            }
+          })
         }
       }
     });
@@ -63,6 +68,31 @@ function toRowID(string) {
   return string.replace(/\s+/, '') + '-row-id';
 }
 
+function loadSimilar(type) {
+  $.getJSON('/similar', {type: type}, function(data) {
+    data.sort(function(a, b) {
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    var items = [];
+    data.forEach(function(entry) {
+      items.push('<li>' + new Date(entry.date) + '</li>');
+      $.each(entry.data, function(key, val) {
+        items.push('<li>' + key + ': ' + val + '</li>');
+      });
+    });
+
+    $('#similar').append(
+      $( "<ul/>", {
+        "class": "my-new-list",
+        html: items.join( "" )
+      })
+    );
+
+    console.log(data);
+  });
+}
+
 $().ready(function() {
 
   function split( val ) {
@@ -72,15 +102,6 @@ $().ready(function() {
     return split(term).pop();
   }
 
-  // function newButton(arg) {
-  //     return '' +
-  //     '<div class="form-group">' +
-  //         '<div class="col-sm-offset-2 col-sm-10">' +
-  //             '<button type="button" onclick="newInput(' + arg +')" class="btn btn-default">New</button>' +
-  //         '</div>' +
-  //     '</div>';
-  // }
-
   function autocomplete(symbol) {
     var availableTags = symbol.names;
 
@@ -88,10 +109,11 @@ $().ready(function() {
       .autocomplete({
         position: {my: "left top", at: "right top"},
         minLength: 0,
-        source: function(request, response) {
-          // delegate back to autocomplete, but extract the last term
-          response($.ui.autocomplete.filter(availableTags, extractLast(request.term)));
-        },
+        // source: function(request, response) {
+        //   // delegate back to autocomplete, but extract the last term
+        //   response($.ui.autocomplete.filter(availableTags, extractLast(request.term)));
+        // },
+        source: availableTags,
         select: function(event, ui) {
           selectCalled = true;
 
@@ -124,6 +146,7 @@ $().ready(function() {
             $('#' + toID(attrs[0])).focus();
             console.log('should have focused');
             $('#type-input').prop('readonly', true);
+            loadSimilar(val);
           }
           if ($('#type-input').val() != '') {
             newField();
@@ -148,6 +171,7 @@ $().ready(function() {
               $('#new').focus();
               // .disabled(true);
               $('#type-input').prop('readonly', true);
+              loadSimilar(typeValue);
               console.log('focusing on new');
             }
           }
@@ -164,14 +188,5 @@ $().ready(function() {
   $.getJSON('/data', function(data) {
     console.log(data);
     autocomplete(data);
-      // var items = [];
-      // $.each( data, function( key, val ) {
-      //   items.push( "<li id='" + key + "'>" + val + "</li>" );
-      // });
-
-      // $( "<ul/>", {
-      //   "class": "my-new-list",
-      //   html: items.join( "" )
-      // }).appendTo( "body" );
   });
 });
