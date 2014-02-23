@@ -4,7 +4,7 @@ var User = mongoose.model('User');
 var ObjectId = mongoose.Types.ObjectId;
 
 var pg = require('pg');
-var connectionString = "/tmp wakeup";
+var connectionString = "/tmp wakeup"; // where the sockect connection is to postgres
 
 Array.prototype.contains = function(k) {
   for (var p in this)
@@ -88,11 +88,11 @@ function addUser(req, res) {
 exports.index = function(req, res) {
   // deleteEntry();
   // addUser('aaron', 'hello');
-  User.find({name: 'aaron'}, function (err, user) {
-    console.log('user is:\n %j', user);
-  });
+  // User.find({name: 'aaron'}, function (err, user) {
+  //   console.log('user is:\n %j', user);
+  // });
 
-  renderMain(res);
+  renderMain(req, res);
 };
 
 exports.submit = function(req, res) {
@@ -151,7 +151,7 @@ exports.submit = function(req, res) {
     }
 
     // render page
-    renderMain(res);
+    renderMain(req, res);
   });
 };
 
@@ -183,6 +183,7 @@ exports.loginPost = function(req, res) {
             console.log('results are %j', result);
             req.session.name = result.rows[0].name;
             req.session.mongo_id = result.rows[0].mongo_id;
+            console.log('about to render main, req is %j', req.session)
             renderMain(req, res);
             done();
           }
