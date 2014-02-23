@@ -13,7 +13,8 @@ var UserSchema = new mongoose.Schema({
 var EntrySchema = new mongoose.Schema({
   type: String,
   date: Date,
-  data: {}
+  data: {},
+  user: mongoose.Schema.Types.ObjectId
 });
 
 mongoose.model('User', UserSchema);

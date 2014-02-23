@@ -96,11 +96,12 @@ exports.submit = function(req, res) {
   delete data.type;
 
   console.log('data is %j', data);
-  var entry = new Entry({ type: type , date: new Date(), data: data });
+
+  var mongo_id = new ObjectId(req.session.mongo_id);
+  var entry = new Entry({ type: type , date: new Date(), data: data, user: mongo_id });
 
   // retrieve user from database
-  var name = "aaron";
-  User.findOne({name: name}, function (err, user) {
+  User.findOne({'_id': mongo_id}, function (err, user) {
     console.log(user);
     console.log(type);
 
@@ -133,8 +134,18 @@ exports.submit = function(req, res) {
 
       console.log('user is:\n %j', user.symbol);
 
+      // save changes to users document
       user.entries.push(entry);
       user.save(function (err, doc) {
+        if (!err) {
+          console.log('Entry added successfully.\n %j', doc.symbol);
+        } else {
+          console.log("Mongoose couldn't save entry: " + err);
+        }
+      });
+
+      // save another copy of the entry as its own document
+      entry.save(function(err, doc) {
         if (!err) {
           console.log('Entry added successfully.\n %j', doc.symbol);
         } else {
@@ -240,12 +251,13 @@ exports.similarEntries = function(req, res) {
       if (user.entries) {
         var queriedEntries = [];
         user.entries.forEach(function(entry) {
-          if (entry.type === query.type) {
+          if (entry.type == query.type) {
             queriedEntries.push(entry);
+            console.log('entry pushed');
           }
           console.log('entry: %j', entry);
-          res.send(queriedEntries);
         });
+        res.send(queriedEntries);
       } else {
         res.send('');
       }
