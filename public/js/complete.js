@@ -42,7 +42,7 @@ function newField() {
         event.preventDefault();
         var newInputName = $('#new').val();
 
-        if (newInputName !== '') {
+        if (newInputName != '') {
           $(newInput(newInputName)).insertBefore('#new-holder');
           $('#new').val('');
           $('#' + toID(newInputName)).focus();
@@ -125,7 +125,7 @@ $().ready(function() {
             console.log('should have focused');
             $('#type-input').prop('readonly', true);
           }
-          if ($('#type-input').val() !== '') {
+          if ($('#type-input').val() != '') {
             newField();
           }
           var joined = attrs.join(':\n\t');
@@ -143,7 +143,7 @@ $().ready(function() {
 
           if (!selectCalled) {
             var typeValue = $('#type-input').val();
-            if (typeValue !== '') {
+            if (typeValue != '') {
               newField();
               $('#new').focus();
               // .disabled(true);

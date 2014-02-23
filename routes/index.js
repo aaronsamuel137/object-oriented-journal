@@ -86,13 +86,11 @@ function addUser(req, res) {
 }
 
 exports.index = function(req, res) {
-  // deleteEntry();
-  // addUser('aaron', 'hello');
-  // User.find({name: 'aaron'}, function (err, user) {
-  //   console.log('user is:\n %j', user);
-  // });
-
-  renderMain(req, res);
+  if (!req.session.name) {
+    res.redirect('/login')
+  } else {
+    renderMain(req, res);
+  }
 };
 
 exports.submit = function(req, res) {
