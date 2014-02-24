@@ -19,7 +19,7 @@ function renderMain(req, res) {
     title: 'Wake UP',
     pagetitle: 'Wake UP',
     name: req.session.name,
-    scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js', '/js/complete.js']
+    script: '/js/complete.js'
   });
 }
 
@@ -28,7 +28,6 @@ function renderLogin(res, msg) {
     title: 'Wake UP',
     pagetitle: 'Log in',
     message: msg,
-    scripts: ['//code.jquery.com/jquery-1.10.1.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js']
   });
 }
 
