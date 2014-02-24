@@ -28,16 +28,18 @@ html
               a(href="#") Edit Schema
             li
               a(href="#") Query Journal
-
-          ul.nav.navbar-nav.navbar-right
             li
-              a(href="#") Logout
+              a(href="#") New Entry
 
-          p.navbar-text.navbar-right
-            | Signed in as&nbsp
-            a.navbar-link(href="#") aaron
+          - if (name)
+            ul.nav.navbar-nav.navbar-right
+              li
+                a(href="/logout") Logout
 
-          //- ul.nav.navbar-nav.navbar-right
+            p.navbar-text.navbar-right
+              | Signed in as&nbsp
+              a.navbar-link(href="#") aaron
+
 
 
     block content

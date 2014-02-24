@@ -36,6 +36,7 @@ app.post('/', routes.submit);
 app.get('/data', routes.data);
 app.get('/login', routes.login);
 app.post('/login', routes.loginPost);
+app.get('/logout', routes.logout);
 app.post('/signup', routes.signup);
 app.get('/similar', routes.similarEntries);
 

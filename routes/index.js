@@ -19,7 +19,7 @@ function renderMain(req, res) {
     title: 'Wake UP',
     pagetitle: 'Wake UP',
     name: req.session.name,
-    script: '/js/complete.js'
+    script: '/js/complete.js',
   });
 }
 
@@ -224,6 +224,11 @@ exports.signup = function(req, res) {
     addUser(req, res);
   }
 };
+
+exports.logout = function(req, res) {
+  req.session.destroy();
+  res.redirect('/')
+}
 
 // json endpoint for getting user data
 exports.data = function(req, res) {
