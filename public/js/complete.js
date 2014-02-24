@@ -1,13 +1,5 @@
 var selectCalled = false; // set to true if autocomplete's select is called
 
-jQuery.fn.extend({
-  disable: function(state) {
-    return this.each(function() {
-      this.disabled = state;
-    });
-  }
-});
-
 function newInput(arg) {
   var inputID = toID(arg);
   var rowID = toRowID(arg);
@@ -76,9 +68,13 @@ function loadSimilar(type) {
 
     var items = [];
     data.forEach(function(entry) {
-      items.push('<li>' + new Date(entry.date) + '</li>');
+      var date = new Date(entry.date).toString();
+      var dateArray = date.split(':');
+      date = [dateArray[0], dateArray[1]].join(':');
+      // var dateStr = (date.getMonth()+1) + '-' + date.getDate() + ' at ' + date.getHours() + ':' + date.getMinutes();
+      items.push('<h4>' + date + '</h4><h4>' + entry.type + '</h4>');
       $.each(entry.data, function(key, val) {
-        items.push('<li>' + key + ': ' + val + '</li>');
+        items.push('<h5>' + key + ': <p>' + val + '</p></h5>');
       });
     });
 
@@ -95,6 +91,14 @@ function loadSimilar(type) {
 
 $().ready(function() {
 
+  // set escape key to reload page, thus reseting the new entry fields
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) {
+      location.reload();
+    }
+  })
+
+  // helper methods
   function split( val ) {
     return val.split(/,\s*/);
   }
@@ -102,6 +106,7 @@ $().ready(function() {
     return split(term).pop();
   }
 
+  // set up the autocomplete widget
   function autocomplete(symbol) {
     var availableTags = symbol.names;
 
