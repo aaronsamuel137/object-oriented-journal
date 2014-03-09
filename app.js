@@ -31,7 +31,7 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/', routes.index);
+app.get('/', routes.newEntry);
 app.post('/', routes.submit);
 app.get('/data', routes.data);
 app.get('/login', routes.login);
@@ -40,6 +40,8 @@ app.get('/logout', routes.logout);
 app.post('/signup', routes.signup);
 app.get('/similar', routes.similarEntries);
 app.get('/query', routes.query);
+app.get('/new', routes.newEntry);
+app.get('/edit', routes.editSchema);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

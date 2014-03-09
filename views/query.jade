@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  #content
+  div.container
+    div.row
+      div.col-md-8
+        form#form-submit.form-horizontal(role='form', onsubmit="submitQuery(); return false;")
+          div#fields
+            div.form-group
+              label(for='type-input') Enter a query:
+              input#type-input.form-control(name='query')
+              div.col-sm-offset-10.col-sm-2
+                button.btn.btn-default#submit-button(type="submit") submit
+        div#header
+
+    div.row
+      div#data

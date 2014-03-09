@@ -70,7 +70,7 @@ function addUser(req, res) {
             console.log('result of insert %j', result);
             req.session.name = req_data.name;
             req.session.mongo_id = mongo_id;
-            renderMain(req, res);
+            res.redirect('/new');
           }
           done();
         }
@@ -79,7 +79,7 @@ function addUser(req, res) {
   });
 }
 
-exports.index = function(req, res) {
+exports.newEntry = function(req, res) {
   if (!req.session.name) {
     res.redirect('/login')
   } else {
@@ -191,7 +191,8 @@ exports.loginPost = function(req, res) {
             req.session.name = result.rows[0].name;
             req.session.mongo_id = result.rows[0].mongo_id;
             console.log('about to render main, req is %j', req.session)
-            renderMain(req, res);
+            res.redirect('/new');
+            // renderMain(req, res);
             done();
           }
         }
@@ -279,10 +280,13 @@ exports.query = function(req, res) {
       name: req.session.name,
       script: '/js/query.js',
     });
-    // var data = req.body;
-    // var query = data.query;
-    // if (query) {
+  }
+}
 
-    // }
+exports.editSchema = function(req, res) {
+  if (!req.session.name) {
+    res.redirect('/login');
+  } else {
+    res.render('edit');
   }
 }
