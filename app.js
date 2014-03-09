@@ -39,6 +39,7 @@ app.post('/login', routes.loginPost);
 app.get('/logout', routes.logout);
 app.post('/signup', routes.signup);
 app.get('/similar', routes.similarEntries);
+app.get('/query', routes.query);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

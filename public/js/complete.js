@@ -109,6 +109,15 @@ $().ready(function() {
   // set up the autocomplete widget
   function autocomplete(symbol) {
     var availableTags = symbol.names;
+    for (var i = 0; i < availableTags.length; i++) {
+      if (availableTags[i] == null) {
+        availableTags.splice(i, 1);
+      }
+      if (availableTags[i] == null) {
+        availableTags.splice(i, 1);
+      }
+    }
+    console.log(availableTags);
 
     $("#type-input")
       .autocomplete({

@@ -268,3 +268,21 @@ exports.similarEntries = function(req, res) {
     }
   });
 };
+
+exports.query = function(req, res) {
+  if (!req.session.name) {
+    res.redirect('/login');
+  } else {
+    res.render('query', {
+      title: 'Wake UP',
+      pagetitle: 'Wake UP',
+      name: req.session.name,
+      script: '/js/query.js',
+    });
+    // var data = req.body;
+    // var query = data.query;
+    // if (query) {
+
+    // }
+  }
+}
