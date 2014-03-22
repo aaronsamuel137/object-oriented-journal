@@ -1,5 +1,6 @@
 function submitQuery() {
   $('#data').html('');
+  $('#header').html('');
   var type = $('#type-input').val();
   console.log("submit called");
   $.getJSON('/similar', {type: type}, function(data) {

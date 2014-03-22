@@ -71,11 +71,11 @@ function loadSimilar(type) {
       var date = new Date(entry.date).toString();
       var dateArray = date.split(':');
       date = [dateArray[0], dateArray[1]].join(':');
-      // var dateStr = (date.getMonth()+1) + '-' + date.getDate() + ' at ' + date.getHours() + ':' + date.getMinutes();
-      items.push('<h4>' + date + '</h4><h4>' + entry.type + '</h4>');
+      items.push('<h4>' + date + '</h4><hr>');
       $.each(entry.data, function(key, val) {
-        items.push('<h5>' + key + ': <p>' + val + '</p></h5>');
+        items.push('<p><b><i>' + key + '</b></i>: ' + val + '</p>');
       });
+      items.push('<br><br>');
     });
 
     $('#similar').append(

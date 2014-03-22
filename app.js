@@ -31,8 +31,7 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/', routes.newEntry);
-app.post('/', routes.submit);
+app.get('/', routes.home);
 app.get('/data', routes.data);
 app.get('/login', routes.login);
 app.post('/login', routes.loginPost);
@@ -41,6 +40,7 @@ app.post('/signup', routes.signup);
 app.get('/similar', routes.similarEntries);
 app.get('/query', routes.query);
 app.get('/new', routes.newEntry);
+app.post('/new', routes.submit);
 app.get('/edit', routes.editSchema);
 
 http.createServer(app).listen(app.get('port'), function(){

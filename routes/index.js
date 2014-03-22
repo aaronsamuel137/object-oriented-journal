@@ -14,8 +14,16 @@ Array.prototype.contains = function(k) {
   return false;
 };
 
-function renderMain(req, res) {
+function renderHome(req, res, msg) {
   res.render('index', {
+    name: req.session.name,
+    msg: msg
+  });
+}
+
+
+function renderNewEntry(req, res) {
+  res.render('new', {
     title: 'Wake UP',
     pagetitle: 'Wake UP',
     name: req.session.name,
@@ -70,20 +78,30 @@ function addUser(req, res) {
             console.log('result of insert %j', result);
             req.session.name = req_data.name;
             req.session.mongo_id = mongo_id;
-            res.redirect('/new');
+            done();
+            res.redirect('/');
           }
-          done();
         }
       );
     }
   });
 }
 
+exports.home = function(req, res) {
+  if (!req.session.name) {
+    res.redirect('/login')
+  } else {
+    var msg = 'This is the prototype for object oriented journaling. ' +
+              'Use the links on the navbar to add new entries or query your journal.';
+    renderHome(req, res, msg);
+  }
+}
+
 exports.newEntry = function(req, res) {
   if (!req.session.name) {
     res.redirect('/login')
   } else {
-    renderMain(req, res);
+    renderNewEntry(req, res);
   }
 };
 
@@ -154,7 +172,8 @@ exports.submit = function(req, res) {
     }
 
     // render page
-    renderMain(req, res);
+    msg = 'Success! Entry has been added.'
+    renderHome(req, res, msg);
   });
 };
 
@@ -191,8 +210,7 @@ exports.loginPost = function(req, res) {
             req.session.name = result.rows[0].name;
             req.session.mongo_id = result.rows[0].mongo_id;
             console.log('about to render main, req is %j', req.session)
-            res.redirect('/new');
-            // renderMain(req, res);
+            res.redirect('/');
             done();
           }
         }
