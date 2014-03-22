@@ -16,6 +16,7 @@ Array.prototype.contains = function(k) {
 
 function renderHome(req, res, msg) {
   res.render('index', {
+    title: 'Object Oriented Journal',
     name: req.session.name,
     msg: msg
   });
@@ -24,8 +25,7 @@ function renderHome(req, res, msg) {
 
 function renderNewEntry(req, res) {
   res.render('new', {
-    title: 'Wake UP',
-    pagetitle: 'Wake UP',
+    title: 'Object Oriented Journal',
     name: req.session.name,
     script: '/js/complete.js',
   });
@@ -33,8 +33,7 @@ function renderNewEntry(req, res) {
 
 function renderLogin(res, msg) {
   res.render('login', {
-    title: 'Wake UP',
-    pagetitle: 'Log in',
+    title: 'Object Oriented Journal',
     message: msg,
   });
 }
@@ -78,8 +77,8 @@ function addUser(req, res) {
             console.log('result of insert %j', result);
             req.session.name = req_data.name;
             req.session.mongo_id = mongo_id;
-            done();
             res.redirect('/');
+            done();
           }
         }
       );
@@ -293,8 +292,7 @@ exports.query = function(req, res) {
     res.redirect('/login');
   } else {
     res.render('query', {
-      title: 'Wake UP',
-      pagetitle: 'Wake UP',
+      title: 'Object Oriented Journal',
       name: req.session.name,
       script: '/js/query.js',
     });
