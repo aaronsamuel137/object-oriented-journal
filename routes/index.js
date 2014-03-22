@@ -77,8 +77,8 @@ function addUser(req, res) {
             console.log('result of insert %j', result);
             req.session.name = req_data.name;
             req.session.mongo_id = mongo_id;
-            res.redirect('/');
             done();
+            res.redirect('/');
           }
         }
       );
@@ -126,7 +126,7 @@ exports.submit = function(req, res) {
       console.log('names are: ' + user.symbol.names);
 
       // if a new name is added, update the symbol object
-      if (!user.symbol.names.contains(type)) {
+      if (type && !user.symbol.names.contains(type)) {
         user.symbol.names.push(type);
         console.log('pushed new name');
 
@@ -138,7 +138,7 @@ exports.submit = function(req, res) {
       }
 
       for (var name in data) {
-        if (!user.symbol.types[type].contains(name)) {
+        if (name && !user.symbol.types[type].contains(name)) {
           user.symbol.types[type].push(name);
           console.log('pushing new name ' + name + ' into type object');
         } else {
@@ -209,8 +209,8 @@ exports.loginPost = function(req, res) {
             req.session.name = result.rows[0].name;
             req.session.mongo_id = result.rows[0].mongo_id;
             console.log('about to render main, req is %j', req.session)
-            res.redirect('/');
             done();
+            res.redirect('/');
           }
         }
       );
