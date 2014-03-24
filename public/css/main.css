@@ -2,6 +2,6 @@
   width: 100%;
 }
 
-.border-form {
-  /*border: solid;*/
+.invisible {
+  display: none;
 }

@@ -1,3 +1,16 @@
+function editEntry(itemNum) {
+  console.log('edit called');
+}
+
+function deleteEntry(itemNum) {
+  console.log('delete called with ' + itemNum);
+  var item = $('#item' + itemNum);
+  var itemId = item.find('.invisible').text();
+  console.log(itemId);
+  item.html('');
+
+}
+
 function submitQuery() {
   $('#data').html('');
   $('#header').html('');
@@ -10,17 +23,27 @@ function submitQuery() {
     });
 
     var items = [];
+    var itemNum = 0;
+
     data.forEach(function(entry) {
 
       if (entry.data) {
         var date = new Date(entry.date).toString();
         var dateArray = date.split(':');
         date = [dateArray[0], dateArray[1]].join(':');
-        items.push('<h4>' + date + '</h4><hr>');
+        items.push('<div id="item' + itemNum + '">');
+        items.push('<h4>' + date +
+                     '<small><span class="pull-right">' +
+                       '<a href="javascript:;" onclick="editEntry(' + itemNum + ');">edit</a> |&nbsp;' +
+                       '<a href="javascript:;" onclick="deleteEntry(' + itemNum + ');">delete</a>' +
+                   '</span></small></h4><hr>');
+        items.push('<span class="invisible">' + entry._id + '</span>');
         $.each(entry.data, function(key, val) {
           items.push('<p><b><i>' + key + '</b></i>: ' + val + '</p>');
         });
-        items.push('<br><br>');
+        items.push('<br>');
+        items.push('</div>');
+        itemNum++;
       }
     });
 
