@@ -5,7 +5,7 @@ var ObjectId = mongoose.Types.ObjectId;
 var url = require('url');
 
 var pg = require('pg');
-var connectionString = "/tmp wakeup"; // where the sockect connection is to postgres
+var connectionString = "/tmp journal"; // where the sockect connection is to postgres
 
 Array.prototype.contains = function(k) {
   for (var p in this)
@@ -270,7 +270,7 @@ exports.similarEntries = function(req, res) {
     if (err) {
       console.log('error: %s', err);
     } else {
-      if (user.entries) {
+      if (user && user.entries) {
         var queriedEntries = [];
         user.entries.forEach(function(entry) {
           if (entry.type == query.type) {
@@ -287,30 +287,60 @@ exports.similarEntries = function(req, res) {
   });
 };
 
-exports.delete = function(req, res) {
-  var url_parts = url.parse(req.url, true);
-  var query = url_parts.query;
+exports.deleteEntry = function(req, res) {
+  var data = req.body;
+  var entryID = data.entryID;
   var mongo_id = new ObjectId(req.session.mongo_id);
 
-  User.findOne({"_id": mongo_id}, function (err, user) {
-    if (err) {
-      console.log('error: %s', err);
-    } else {
-      if (user.entries) {
-        var queriedEntries = [];
-        user.entries.forEach(function(entry) {
-          if (entry.type == query.type) {
-            queriedEntries.push(entry);
-            console.log('entry pushed');
-          }
-          console.log('entry: %j', entry);
+  console.log('query is %j', data);
+
+  console.log('delete called with id %s', entryID);
+
+  var deleteEntryQuery = Entry.findOne({'_id': entryID});
+  var deletePromise = deleteEntryQuery.remove().exec();
+
+  var deleteUsersEntry = User.findOne({"_id": mongo_id});
+  var deleteUsersEntryPromise = deleteUsersEntry.exec();
+
+  deleteUsersEntryPromise.then(function(doc) {
+    console.log('document is %j', doc);
+    for (var i = 0; i < doc.entries.length; i++) {
+      if (doc.entries[i]._id == entryID) {
+        console.log('splicing');
+        doc.entries.splice(i, 1);
+        // doc.markModified('entries');
+        doc.save( function (err) {
+          if (err)
+            return;
+          console.log('Saved');
         });
-        res.send(queriedEntries);
       } else {
-        res.send('');
+        console.log('not found');
       }
     }
+  }, function(err) {
+    console.log('error: %s', err);
   });
+
+  // User.findOne({"_id": mongo_id}, function (err, user) {
+  //   if (err) {
+  //     console.log('error: %s', err);
+  //   } else {
+  //     if (user.entries) {
+  //       var queriedEntries = [];
+  //       user.entries.forEach(function(entry) {
+  //         if (entry.type == query.type) {
+  //           queriedEntries.push(entry);
+  //           console.log('entry pushed');
+  //         }
+  //         console.log('entry: %j', entry);
+  //       });
+  //       res.send(queriedEntries);
+  //     } else {
+  //       res.send('');
+  //     }
+  //   }
+  // });
 };
 
 exports.query = function(req, res) {

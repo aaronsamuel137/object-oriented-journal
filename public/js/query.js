@@ -7,8 +7,8 @@ function deleteEntry(itemNum) {
   var item = $('#item' + itemNum);
   var itemId = item.find('.invisible').text();
   console.log(itemId);
+  $.post('/delete', {entryID: itemId});
   item.html('');
-
 }
 
 function submitQuery() {

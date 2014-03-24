@@ -21,5 +21,5 @@ mongoose.model('User', UserSchema);
 mongoose.model('Entry', EntrySchema);
 
 // connect to mongo server
-mongoose.connect('mongodb://localhost/wakeup');
+mongoose.connect('mongodb://localhost/journal');
 console.log('connected to mongo database');

@@ -16,7 +16,7 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.cookieParser());
-  app.use(express.session({secret: 'iyg2f7eygr248972r'}));
+  app.use(express.session({secret: 'iyg2f7eygr248972r', cookie: { maxAge: 3600000 }}));
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
@@ -42,6 +42,7 @@ app.get('/query', routes.query);
 app.get('/new', routes.newEntry);
 app.post('/new', routes.submit);
 app.get('/edit', routes.editSchema);
+app.post('/delete', routes.deleteEntry);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
