@@ -7,7 +7,7 @@ function newInput(arg) {
   '<div id="' + rowID + '" class="form-group">' +
     '<label class="col-sm-2 control-label" for="' + inputID + '">' + arg + '</label>' +
     '<div class="col-sm-9">' +
-      '<input type="text" class="form-control" id="' + inputID + '" name="' + arg + '">' +
+      '<textarea type="text" class="form-control" id="' + inputID + '" name="' + arg + '"></textarea>' +
     '</div>' +
     '<div class="col-sm-1">' +
       '<button type="button" onclick="$(\'#' + rowID + '\').remove();">X</button>' +

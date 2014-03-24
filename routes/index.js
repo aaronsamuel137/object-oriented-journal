@@ -287,6 +287,32 @@ exports.similarEntries = function(req, res) {
   });
 };
 
+exports.delete = function(req, res) {
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  var mongo_id = new ObjectId(req.session.mongo_id);
+
+  User.findOne({"_id": mongo_id}, function (err, user) {
+    if (err) {
+      console.log('error: %s', err);
+    } else {
+      if (user.entries) {
+        var queriedEntries = [];
+        user.entries.forEach(function(entry) {
+          if (entry.type == query.type) {
+            queriedEntries.push(entry);
+            console.log('entry pushed');
+          }
+          console.log('entry: %j', entry);
+        });
+        res.send(queriedEntries);
+      } else {
+        res.send('');
+      }
+    }
+  });
+};
+
 exports.query = function(req, res) {
   if (!req.session.name) {
     res.redirect('/login');
