@@ -1,12 +1,36 @@
 function editEntry(itemNum) {
-  console.log('edit called');
+  var item = $('#item' + itemNum);
+  var itemId = item.find('.invisible').text();
+  var key = item.find($('i'));
+  var value = item.find($('p span'));
+
+  for (var i = 0; i < key.length; i++) {
+    var keyTextNode = key[i].firstChild;
+    var valueTextNode = value[i].firstChild;
+    var keyText = keyTextNode.nodeValue;
+    var valueText = valueTextNode.nodeValue;
+
+    var input = document.createElement('input');
+    input.setAttribute('class', 'form-control');
+    input.setAttribute('type', 'text');
+    input.setAttribute('id', 'new_key');
+    input.setAttribute('placeholder', keyText);
+
+    var textarea = document.createElement('textarea');
+    textarea.setAttribute('class', 'form-control');
+    textarea.setAttribute('id', 'new_text');
+
+    var text = document.createTextNode(valueText);
+    textarea.appendChild(text);
+
+    key[i].replaceChild(input, keyTextNode);
+    value[i].replaceChild(textarea, valueTextNode);
+  }
 }
 
 function deleteEntry(itemNum) {
-  console.log('delete called with ' + itemNum);
   var item = $('#item' + itemNum);
   var itemId = item.find('.invisible').text();
-  console.log(itemId);
   $.post('/delete', {entryID: itemId});
   item.html('');
 }
@@ -40,7 +64,7 @@ function submitQuery() {
                    '</span></small></h4><hr>');
         items.push('<span class="invisible">' + entry._id + '</span>');
         $.each(entry.data, function(key, val) {
-          items.push('<p><b><i>' + key + '</b></i>: ' + val + '</p>');
+          items.push('<p><b><i>' + key + '</b></i>:&nbsp;<span>' + val + '</span></p>');
         });
         items.push('<br>');
         items.push('</div>');

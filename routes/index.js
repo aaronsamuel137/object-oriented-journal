@@ -348,7 +348,7 @@ exports.deleteEntry = function(req, res) {
 
         // remove from symbol types
         console.log('deleting... ?');
-        delete doc.symbol.types.name;
+        doc.symbol.types.name = undefined;
 
         doc.markModified('symbol');
         doc.markModified('symbol.types');
