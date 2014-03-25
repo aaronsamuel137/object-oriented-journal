@@ -57,8 +57,6 @@ function submitEdit(itemNum) {
     key = $('#new_key' + itemNum + '-' + i).val();
     val = $('#new_text' + itemNum + '-' + i).val();
     params[key] = val;
-    // params['key' + i] = key;
-    // params['val' + i] = val;
   }
 
   $.post('/edit', params)
@@ -104,7 +102,14 @@ function submitQuery() {
                    '</span></small></h4><hr>');
         items.push('<span class="invisible">' + entry._id + '</span>');
         $.each(entry.data, function(key, val) {
-          items.push('<p><b><i>' + key + '</b></i><strong>:&nbsp;</strong><span>' + val + '</span></p>');
+          if (val instanceof Array) {
+            console.log('array!');
+            for (var i = 0; i < val.length; i++) {
+              items.push('<p><b><i>' + key + '</b></i><strong>:&nbsp;</strong><span>' + val[i] + '</span></p>');
+            }
+          } else {
+            items.push('<p><b><i>' + key + '</b></i><strong>:&nbsp;</strong><span>' + val + '</span></p>');
+          }
         });
         items.push('<br>');
         items.push('</div>');

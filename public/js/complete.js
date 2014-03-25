@@ -10,7 +10,7 @@ function newInput(arg) {
       '<textarea class="form-control" id="' + inputID + '" name="' + arg + '"></textarea>' +
     '</div>' +
     '<div class="col-sm-1">' +
-      '<button type="button" onclick="$(\'#' + rowID + '\').remove();">X</button>' +
+      '<button class="btn btn-default" type="button" onclick="$(\'#' + rowID + '\').remove();">X</button>' +
     '</div>' +
   '</div>';
 }
@@ -73,7 +73,14 @@ function loadSimilar(type) {
       date = [dateArray[0], dateArray[1]].join(':');
       items.push('<h4>' + date + '</h4><hr>');
       $.each(entry.data, function(key, val) {
-        items.push('<p><b><i>' + key + '</b></i>: ' + val + '</p>');
+        if (val instanceof Array) {
+          console.log('array!');
+          for (var i = 0; i < val.length; i++) {
+            items.push('<p><b><i>' + key + '</b></i>: ' + val[i] + '</p>');
+          }
+        } else {
+          items.push('<p><b><i>' + key + '</b></i>: ' + val + '</p>');
+        }
       });
       items.push('<br><br>');
     });
