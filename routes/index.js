@@ -370,38 +370,56 @@ exports.deleteEntry = function(req, res) {
 
 exports.editEntry = function(req, res) {
   var data = req.body;
-  var entryID = data.entryID;
-  var mongo_id = new ObjectId(req.session.mongo_id);
-
   console.log('params are %j', data);
 
-  // Entry.findOne({'_id': entryID}, function (err, entry) {
-  //   if (err) {
-  //     console.log('error: %s', err);
-  //   } else {
+  var entryID = new ObjectId(data.entryID);
+  delete data.entryID;
+  var mongo_id = new ObjectId(req.session.mongo_id);
 
-  //   }
-  // });
+  console.log('entry ID is ' + entryID);
 
-  // User.findOne({"_id": mongo_id}, function (err, user) {
-  //   if (err) {
-  //     console.log('error: %s', err);
-  //   } else {
-  //     if (user && user.entries) {
-  //       var queriedEntries = [];
-  //       user.entries.forEach(function(entry) {
-  //         if (entry.type == query.type) {
-  //           queriedEntries.push(entry);
-  //           console.log('entry pushed');
-  //         }
-  //         console.log('entry: %j', entry);
-  //       });
-  //       res.send(queriedEntries);
-  //     } else {
-  //       res.send('');
-  //     }
-  //   }
-  // });
+
+  Entry.findOne({'_id': entryID}, function (err, entry) {
+    if (err) {
+      console.log('error: %s', err);
+    } else if (entry) {
+      console.log('entry is %j', entry);
+      entry.data = data;
+      entry.markModified('data');
+      entry.save(function (err) {
+        if (err)
+          return;
+        console.log('Saved');
+      });
+    }
+  });
+
+  User.findOne({'_id': mongo_id}, function (err, user) {
+    if (err) {
+      console.log('error: %s', err);
+    } else if (user && user.entries) {
+      console.log('user found');
+
+      for (var i = 0; i < user.entries.length; i++) {
+        if (user.entries[i]._id.equals(entryID)) {
+          console.log('found entry!');
+          console.log('entry: %j', user.entries[i]);
+          user.entries[i].data = data;
+          user.markModified('entries');
+          user.save(function (err) {
+            if (err)
+              return;
+            console.log('Saved in user');
+          });
+          break;
+        }
+      }
+
+    } else {
+      console.log('nothing happened in user findOne');
+    }
+  });
+
   res.send('');
 }
 

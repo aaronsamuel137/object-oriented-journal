@@ -56,8 +56,9 @@ function submitEdit(itemNum) {
   for (var i = 0; i < numKeys; i++) {
     key = $('#new_key' + itemNum + '-' + i).val();
     val = $('#new_text' + itemNum + '-' + i).val();
-    params['key' + i] = key;
-    params['val' + i] = val;
+    params[key] = val;
+    // params['key' + i] = key;
+    // params['val' + i] = val;
   }
 
   $.post('/edit', params)
