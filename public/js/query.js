@@ -24,6 +24,7 @@ function submitQuery() {
 
     var items = [];
     var itemNum = 0;
+    var innerType = type;
 
     data.forEach(function(entry) {
 

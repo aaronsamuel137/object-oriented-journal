@@ -293,7 +293,6 @@ exports.deleteEntry = function(req, res) {
   var mongo_id = new ObjectId(req.session.mongo_id);
 
   console.log('query is %j', data);
-
   console.log('delete called with id %s', entryID);
 
   var deleteEntryQuery = Entry.findOne({'_id': entryID});
@@ -304,43 +303,69 @@ exports.deleteEntry = function(req, res) {
 
   deleteUsersEntryPromise.then(function(doc) {
     console.log('document is %j', doc);
+
+    var modified = false;
+    var stillInTypes = false;
+    var name = null;
     for (var i = 0; i < doc.entries.length; i++) {
+
       if (doc.entries[i]._id == entryID) {
         console.log('splicing');
+        name = doc.entries[i].type;
         doc.entries.splice(i, 1);
-        // doc.markModified('entries');
-        doc.save( function (err) {
-          if (err)
-            return;
-          console.log('Saved');
-        });
+        modified = true;
+        break;
+
       } else {
         console.log('not found');
       }
     }
+
+    if (name) {
+      console.log('name is %s', name);
+      for (var i = 0; i < doc.entries.length; i++) {
+        if (doc.entries[i].type === name) {
+          stillInTypes = true;
+          break;
+        }
+      }
+    }
+
+    console.log(stillInTypes);
+    console.log(modified);
+
+    if (modified) {
+      if (!stillInTypes) {
+        console.log('removing from symbol');
+
+        // remove from names array
+        var idx = doc.symbol.names.indexOf(name);
+        console.log('index is ' + idx);
+        if (idx !== -1) {
+          doc.symbol.names.splice(idx, 1);
+          console.log('removing %s from names', name);
+        }
+
+        // remove from symbol types
+        console.log('deleting... ?');
+        delete doc.symbol.types.name;
+
+        doc.markModified('symbol');
+        doc.markModified('symbol.types');
+      }
+
+      doc.save( function (err) {
+        if (err)
+          return;
+        console.log('Saved');
+      });
+    }
+
   }, function(err) {
     console.log('error: %s', err);
   });
 
-  // User.findOne({"_id": mongo_id}, function (err, user) {
-  //   if (err) {
-  //     console.log('error: %s', err);
-  //   } else {
-  //     if (user.entries) {
-  //       var queriedEntries = [];
-  //       user.entries.forEach(function(entry) {
-  //         if (entry.type == query.type) {
-  //           queriedEntries.push(entry);
-  //           console.log('entry pushed');
-  //         }
-  //         console.log('entry: %j', entry);
-  //       });
-  //       res.send(queriedEntries);
-  //     } else {
-  //       res.send('');
-  //     }
-  //   }
-  // });
+  res.send('');
 };
 
 exports.query = function(req, res) {
