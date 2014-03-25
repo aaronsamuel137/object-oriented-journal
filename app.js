@@ -43,6 +43,7 @@ app.get('/new', routes.newEntry);
 app.post('/new', routes.submit);
 app.get('/edit', routes.editSchema);
 app.post('/delete', routes.deleteEntry);
+app.post('/edit', routes.editEntry);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

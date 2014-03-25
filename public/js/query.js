@@ -21,12 +21,12 @@ function editEntry(itemNum) {
     var input = document.createElement('input');
     input.setAttribute('class', 'form-control');
     input.setAttribute('type', 'text');
-    input.setAttribute('id', 'new_key');
-    input.setAttribute('placeholder', keyText);
+    input.setAttribute('id', 'new_key' + itemNum  + '-' + i);
+    input.setAttribute('value', keyText);
 
     var textarea = document.createElement('textarea');
     textarea.setAttribute('class', 'form-control');
-    textarea.setAttribute('id', 'new_text');
+    textarea.setAttribute('id', 'new_text' + itemNum + '-' + i);
 
     var text = document.createTextNode(valueText);
     textarea.appendChild(text);
@@ -40,12 +40,31 @@ function editEntry(itemNum) {
 
   item.append('' +
     '<div class="margins">' +
-      '<button class="btn btn-default pull-right" type="button" onclick="submitEdit();">Submit Edit</button>' +
+      '<button class="btn btn-default pull-right" type="button" onclick="submitEdit(' + itemNum + ');">Submit Edit</button>' +
     '</div>');
 }
 
-function submitEdit() {
-  console.log('submitted');
+function submitEdit(itemNum) {
+  console.log('edit called with ' + itemNum);
+  var item = $('#item' + itemNum);
+  var itemId = item.find('.invisible').text();
+  var numKeys = item.find($('i')).length;
+
+  var params = {entryID: itemId};
+  var key;
+  var val;
+  for (var i = 0; i < numKeys; i++) {
+    key = $('#new_key' + itemNum + '-' + i).val();
+    val = $('#new_text' + itemNum + '-' + i).val();
+    params['key' + i] = key;
+    params['val' + i] = val;
+  }
+
+  $.post('/edit', params)
+    .done(function(data) {
+      alert('Success! Entry updated');
+      location.reload();
+    });
 }
 
 function deleteEntry(itemNum) {

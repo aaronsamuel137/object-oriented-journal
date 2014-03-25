@@ -351,7 +351,7 @@ exports.deleteEntry = function(req, res) {
         doc.symbol.types.name = undefined;
 
         doc.markModified('symbol');
-        doc.markModified('symbol.types');
+        // doc.markModified('symbol.types');
       }
 
       doc.save( function (err) {
@@ -367,6 +367,43 @@ exports.deleteEntry = function(req, res) {
 
   res.send('');
 };
+
+exports.editEntry = function(req, res) {
+  var data = req.body;
+  var entryID = data.entryID;
+  var mongo_id = new ObjectId(req.session.mongo_id);
+
+  console.log('params are %j', data);
+
+  // Entry.findOne({'_id': entryID}, function (err, entry) {
+  //   if (err) {
+  //     console.log('error: %s', err);
+  //   } else {
+
+  //   }
+  // });
+
+  // User.findOne({"_id": mongo_id}, function (err, user) {
+  //   if (err) {
+  //     console.log('error: %s', err);
+  //   } else {
+  //     if (user && user.entries) {
+  //       var queriedEntries = [];
+  //       user.entries.forEach(function(entry) {
+  //         if (entry.type == query.type) {
+  //           queriedEntries.push(entry);
+  //           console.log('entry pushed');
+  //         }
+  //         console.log('entry: %j', entry);
+  //       });
+  //       res.send(queriedEntries);
+  //     } else {
+  //       res.send('');
+  //     }
+  //   }
+  // });
+  res.send('');
+}
 
 exports.query = function(req, res) {
   if (!req.session.name) {
