@@ -4,11 +4,19 @@ function editEntry(itemNum) {
   var key = item.find($('i'));
   var value = item.find($('p span'));
 
+  item.find($('strong')).html('');
+
   for (var i = 0; i < key.length; i++) {
     var keyTextNode = key[i].firstChild;
     var valueTextNode = value[i].firstChild;
     var keyText = keyTextNode.nodeValue;
     var valueText = valueTextNode.nodeValue;
+
+    var inputDiv = document.createElement('div');
+    inputDiv.setAttribute('class', 'col-md-4');
+
+    var textDiv = document.createElement('div');
+    textDiv.setAttribute('class', 'col-md-8');
 
     var input = document.createElement('input');
     input.setAttribute('class', 'form-control');
@@ -23,9 +31,21 @@ function editEntry(itemNum) {
     var text = document.createTextNode(valueText);
     textarea.appendChild(text);
 
-    key[i].replaceChild(input, keyTextNode);
-    value[i].replaceChild(textarea, valueTextNode);
+    inputDiv.appendChild(input);
+    textDiv.appendChild(textarea);
+
+    key[i].replaceChild(inputDiv, keyTextNode);
+    value[i].replaceChild(textDiv, valueTextNode);
   }
+
+  item.append('' +
+    '<div class="margins">' +
+      '<button class="btn btn-default pull-right" type="button" onclick="submitEdit();">Submit Edit</button>' +
+    '</div>');
+}
+
+function submitEdit() {
+  console.log('submitted');
 }
 
 function deleteEntry(itemNum) {
@@ -64,7 +84,7 @@ function submitQuery() {
                    '</span></small></h4><hr>');
         items.push('<span class="invisible">' + entry._id + '</span>');
         $.each(entry.data, function(key, val) {
-          items.push('<p><b><i>' + key + '</b></i>:&nbsp;<span>' + val + '</span></p>');
+          items.push('<p><b><i>' + key + '</b></i><strong>:&nbsp;</strong><span>' + val + '</span></p>');
         });
         items.push('<br>');
         items.push('</div>');
