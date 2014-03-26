@@ -4,6 +4,8 @@ var User = mongoose.model('User');
 var ObjectId = mongoose.Types.ObjectId;
 var url = require('url');
 
+var dbcalls = require('../model/dbcalls');
+
 var pg = require('pg');
 var connectionString = "/tmp journal"; // where the sockect connection is to postgres
 
@@ -22,7 +24,6 @@ function renderHome(req, res, msg) {
   });
 }
 
-
 function renderNewEntry(req, res) {
   res.render('new', {
     title: 'Object Oriented Journal',
@@ -39,51 +40,12 @@ function renderLogin(res, msg) {
 }
 
 function addUser(req, res) {
-  var req_data = req.body;
+  var username = req.body.username;
 
-  // add user to mongodb
-  var symbol = {
-    types: {},
-    names: []
-  };
-  var user = new User({ name: req_data.username, symbol: symbol, entries: [] });
-  var mongo_id = user.id;
-  console.log('new user: ' + user.id);
-  user.save( function (err) {
-    if (err)
-      return;
-    console.log('Saved');
-  });
+  var mongo_id = dbcalls.addUserToMongo(username);
 
-  // add user to postgres
-  console.log('about to add to pg');
-  pg.connect(connectionString, function(err, client, done) {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query(
-        'INSERT INTO users (name, email, password, created_at, mongo_id) VALUES ($1, $2, $3, $4, $5);',
-        [
-          req_data.username,
-          req_data.email,
-          req_data.password,
-          new Date(),
-          mongo_id
-        ],
-        function(err, result) {
-          if (err) {
-            console.log('query error: ' + err);
-          } else {
-            console.log('result of insert %j', result);
-            req.session.name = req_data.name;
-            req.session.mongo_id = mongo_id;
-            done();
-            res.redirect('/');
-          }
-        }
-      );
-    }
-  });
+  // add user to postgres and render the response once complete
+  dbcalls.addUserToPostgres(req, res, mongo_id);
 }
 
 exports.home = function(req, res) {
