@@ -407,8 +407,24 @@ exports.editEntry = function(req, res) {
           console.log('entry: %j', user.entries[i]);
           oldEntry = user.entries[i];
           user.entries[i].data = data;
-
           user.markModified('entries');
+
+          var dataType = user.entries[i].type;
+
+          console.log('data type is: %j', dataType);
+          console.log('symbol type is: %j', user.symbol.types[dataType]);
+
+          if (user.symbol.types[dataType]) {
+            console.log('symbol type is: %j', user.symbol.types[dataType]);
+            var newTypeData = [];
+            for (var key in data) {
+              newTypeData.push(key);
+            }
+            console.log('newTypeData: %j', newTypeData);
+            user.symbol.types[dataType] = newTypeData;
+            user.markModified('symbol');
+          }
+
           user.save(function (err) {
             if (err)
               return;
