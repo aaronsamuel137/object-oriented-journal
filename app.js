@@ -41,7 +41,7 @@ app.get('/similar', routes.similarEntries);
 app.get('/query', routes.query);
 app.get('/new', routes.newEntry);
 app.post('/new', routes.submit);
-app.get('/edit', routes.editSchema);
+app.get('/about', routes.about);
 app.post('/delete', routes.deleteEntry);
 app.post('/edit', routes.editEntry);
 

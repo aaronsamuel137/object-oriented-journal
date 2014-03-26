@@ -394,6 +394,7 @@ exports.editEntry = function(req, res) {
     }
   });
 
+  var oldEntry;
   User.findOne({'_id': mongo_id}, function (err, user) {
     if (err) {
       console.log('error: %s', err);
@@ -404,7 +405,9 @@ exports.editEntry = function(req, res) {
         if (user.entries[i]._id.equals(entryID)) {
           console.log('found entry!');
           console.log('entry: %j', user.entries[i]);
+          oldEntry = user.entries[i];
           user.entries[i].data = data;
+
           user.markModified('entries');
           user.save(function (err) {
             if (err)
@@ -435,10 +438,6 @@ exports.query = function(req, res) {
   }
 }
 
-exports.editSchema = function(req, res) {
-  if (!req.session.name) {
-    res.redirect('/login');
-  } else {
-    res.render('edit');
-  }
+exports.about = function(req, res) {
+  res.render('about');
 }
