@@ -9,12 +9,6 @@ var dbcalls = require('../model/dbcalls');
 var pg = require('pg');
 var connectionString = "/tmp journal"; // where the sockect connection is to postgres
 
-Array.prototype.contains = function(k) {
-  for (var p in this)
-    if (this[p] === k)
-      return true;
-  return false;
-};
 
 function renderHome(req, res, msg) {
   res.render('index', {
@@ -68,74 +62,13 @@ exports.newEntry = function(req, res) {
 
 exports.submit = function(req, res) {
 
-  // get parameters and create entry object
+  // get parameters
   var data = req.body;
   var type = data.type;
   delete data.type;
 
-  console.log('data is %j', data);
-
-  var mongo_id = new ObjectId(req.session.mongo_id);
-  var entry = new Entry({ type: type , date: new Date(), data: data, user: mongo_id });
-
-  // retrieve user from database
-  User.findOne({'_id': mongo_id}, function (err, user) {
-    console.log(user);
-    console.log(type);
-
-    // add posted entry to db
-    if (user) {
-      console.log('names are: ' + user.symbol.names);
-
-      // if a new name is added, update the symbol object
-      if (type && !user.symbol.names.contains(type)) {
-        user.symbol.names.push(type);
-        console.log('pushed new name');
-
-        if (!user.symbol.types) {
-          user.symbol.types = {};
-        }
-        user.symbol.types[type] = [];
-        console.log('added new type');
-      }
-
-      for (var name in data) {
-        if (name && !user.symbol.types[type].contains(name)) {
-          user.symbol.types[type].push(name);
-          console.log('pushing new name ' + name + ' into type object');
-        } else {
-          console.log('didnt push ' + name);
-        }
-      }
-
-      user.markModified('symbol');
-
-      console.log('user is:\n %j', user.symbol);
-
-      // save changes to users document
-      user.entries.push(entry);
-      user.save(function (err, doc) {
-        if (!err) {
-          console.log('Entry added successfully.\n %j', doc.symbol);
-        } else {
-          console.log("Mongoose couldn't save entry: " + err);
-        }
-      });
-
-      // save another copy of the entry as its own document
-      entry.save(function(err, doc) {
-        if (!err) {
-          console.log('Entry added successfully.\n %j', doc.symbol);
-        } else {
-          console.log("Mongoose couldn't save entry: " + err);
-        }
-      });
-    }
-
-    // render page
-    msg = 'Success! Entry has been added.'
-    renderHome(req, res, msg);
-  });
+  // add new entry to database and render main page
+  dbcalls.submitEntry(req, res, data, type);
 };
 
 exports.login = function(req, res) {
