@@ -84,6 +84,43 @@ exports.addUserToPostgres = function(req, res, mongo_id) {
 }
 
 /**
+ * Looks up user in the postgres users table, creates a session to keep the user
+ * logged in, and redirects to the main page. If invalid information is given,
+ * asks the user to try again,
+ */
+exports.login = function(req, res) {
+  var params = req.body;
+
+  pg.connect(connectionString, function(err, client, done) {
+    if (err) {
+      console.log('Error connecting to postgres user %s', err);
+    } else {
+      client.query(
+        'SELECT name, mongo_id FROM users WHERE email = $1 AND password = $2',
+        [
+          params.email,
+          params.password,
+        ],
+        function(err, result) {
+          if (err) {
+            console.log('Error logging in user %s', err);
+          } else if (result.rowCount === 0) {
+            var msg = 'Email address/password combination not found<br>' +
+                      'Try again or create a new account';
+            renderLogin(res, msg);
+          } else {
+            req.session.name = result.rows[0].name;
+            req.session.mongo_id = result.rows[0].mongo_id;
+            done();
+            res.redirect('/');
+          }
+        }
+      );
+    }
+  });
+}
+
+/**
  * Add a new entry to the mongo database. The entry is saved in the user's
  * document, as well as in a separate collection that holds just entries.
  */

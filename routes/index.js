@@ -81,36 +81,9 @@ exports.login = function(req, res) {
 };
 
 exports.loginPost = function(req, res) {
-  var req_data = req.body;
-  pg.connect(connectionString, function(err, client, done) {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query(
-        'SELECT name, mongo_id FROM users WHERE email = $1 AND password = $2',
-        [
-          req_data.email,
-          req_data.password,
-        ],
-        function(err, result) {
-          if (err) {
-            console.log(err);
-          } else if (result.rowCount === 0) {
-            var msg = 'Email address/password combination not found<br>' +
-                      'Try again or create a new account';
-            renderLogin(res, msg);
-          } else {
-            console.log('results are %j', result);
-            req.session.name = result.rows[0].name;
-            req.session.mongo_id = result.rows[0].mongo_id;
-            console.log('about to render main, req is %j', req.session)
-            done();
-            res.redirect('/');
-          }
-        }
-      );
-    }
-  });
+  // login user by looking them up in the database and creating a session,
+  // redirects to the main page
+  dbcalls.login(req, res);
 };
 
 exports.signup = function(req, res) {
