@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var textSearch = require('mongoose-text-search');
 
 // mongo schemas
 var UserSchema = new mongoose.Schema({
@@ -16,6 +17,14 @@ var EntrySchema = new mongoose.Schema({
   data: {},
   user: mongoose.Schema.Types.ObjectId
 });
+
+// give our schema text search capabilities
+// UserSchema.plugin(textSearch);
+EntrySchema.plugin(textSearch);
+
+// add a text index to the tags array
+// UserSchema.index({ entries: 'text' });
+EntrySchema.index({ '$**': 'text' });
 
 mongoose.model('User', UserSchema);
 mongoose.model('Entry', EntrySchema);

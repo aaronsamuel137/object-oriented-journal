@@ -156,12 +156,12 @@ $().ready(function() {
   // set up the autocomplete widget
   function autocomplete(symbol) {
     var availableTags = symbol.names;
-    for (var i = 0; i < availableTags.length; i++) {
-      if (availableTags[i] === null) {
-        availableTags.splice(i, 1);
-      }
-      if (availableTags[i] === null) {
-        availableTags.splice(i, 1);
+    for (var key in symbol.types) {
+      console.log(key);
+      if (symbol.types[key] !== null) {
+        for (var i = 0; i < symbol.types[key].length; i++) {
+          availableTags.push(symbol.types[key][i]);
+        }
       }
     }
     console.log(availableTags);
