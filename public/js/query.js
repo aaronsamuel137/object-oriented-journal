@@ -103,6 +103,7 @@ function submitQuery() {
                        '<a href="javascript:;" onclick="deleteEntry(' + itemNum + ');">delete</a>' +
                    '</span></small></h4><hr>');
         items.push('<span class="invisible">' + entry._id + '</span>');
+        items.push('<h4><u>Category: ' + entry.type + '</u></h4>');
         $.each(entry.data, function(key, val) {
           if (val instanceof Array) {
             console.log('array!');
