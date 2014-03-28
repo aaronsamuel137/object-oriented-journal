@@ -220,20 +220,43 @@ exports.renderSimilarEntries = function(mongo_id, query, res) {
 }
 
 exports.renderQueryJSON = function(mongo_id, params, res) {
-  var query = params.query;
+  var query = params.type;
   var queryby = params.queryby;
+  console.log('querying with query %s and queryby %s', query, queryby)
 
   User.findOne({"_id": mongo_id}, function (err, user) {
     if (err) {
       console.log('Error: %s', err);
     } else {
       if (user && user.entries) {
+
         var queriedEntries = [];
-        user.entries.forEach(function(entry) {
-          if (entry.type == query.type) {
-            queriedEntries.push(entry);
+
+        if (queryby === 'category') {
+          console.log('query by category');
+          for (var i = 0; i < user.entries.length; i++) {
+            if (user.entries[i].type == query) {
+              queriedEntries.push(user.entries[i]);
+            }
           }
-        });
+        } else if (queryby === 'sub-category') {
+          console.log('query by sub-category');
+          for (var i = 0; i < user.entries.length; i++) {
+            for (var key in user.entries[i].data) {
+              if (key == query) {
+                queriedEntries.push(user.entries[i]);
+                continue;
+              }
+            }
+          }
+        } else if (queryby === 'entry text') {
+          console.log('query by text');
+          for (var i = 0; i < user.entries.length; i++) {}
+        } else {
+          res.send('');
+          return;
+        }
+        console.log('rendering json %j', queriedEntries);
         res.send(queriedEntries);
       } else {
         res.send('');

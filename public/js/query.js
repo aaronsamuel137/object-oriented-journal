@@ -80,7 +80,7 @@ function submitQuery() {
   var queryby = $.trim($('#query-by').contents()[0].textContent);
   console.log(queryby);
   console.log("submit called");
-  $.getJSON('/similar', {type: type, queryby: queryby}, function(data) {
+  $.getJSON('/fullquery', {type: type, queryby: queryby}, function(data) {
 
     data.sort(function(a, b) {
       return new Date(b.date) - new Date(a.date);
@@ -119,7 +119,7 @@ function submitQuery() {
       }
     });
 
-    $('#header').append('<h3>' + type + '</h3>');
+    $('#header').append('<h3><i>' + queryby + '</i>: ' + type + '</h3>');
     $('#data').append(
       $( "<ul/>", {
         "class": "my-new-list",
