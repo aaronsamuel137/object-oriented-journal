@@ -219,6 +219,29 @@ exports.renderSimilarEntries = function(mongo_id, query, res) {
   });
 }
 
+exports.renderQueryJSON = function(mongo_id, params, res) {
+  var query = params.query;
+  var queryby = params.queryby;
+
+  User.findOne({"_id": mongo_id}, function (err, user) {
+    if (err) {
+      console.log('Error: %s', err);
+    } else {
+      if (user && user.entries) {
+        var queriedEntries = [];
+        user.entries.forEach(function(entry) {
+          if (entry.type == query.type) {
+            queriedEntries.push(entry);
+          }
+        });
+        res.send(queriedEntries);
+      } else {
+        res.send('');
+      }
+    }
+  });
+}
+
 /**
  * Delete an entry from the entries collection
  */

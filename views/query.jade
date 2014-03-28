@@ -10,11 +10,23 @@ block content
         form#form-submit.form-horizontal(role='form', onsubmit="submitQuery(); return false;")
           div#fields
             div.form-group
-              label(for='type-input') Query by category:
+              label(for='type-input') Enter a query:
               input#type-input.form-control(name='query')
               div.col-sm-offset-10.col-sm-2
                 button.btn.btn-default#submit-button(type="submit") submit
         div#header
+      div.col-md-4
+        label(for='query-by') Query by:&nbsp;&nbsp;&nbsp;&nbsp;
+        div.btn-group
+          button#query-by(type='button', class='btn btn-default dropdown-toggle', data-toggle='dropdown') category&nbsp;
+            span.caret
+          ul.dropdown-menu
+            li
+              a#category(href='#') category
+            li
+              a#sub-category(href='#') sub-category
+            li
+              a#entry-text(href='#') entry text
 
     div.row
       div#data

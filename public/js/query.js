@@ -77,8 +77,10 @@ function submitQuery() {
   $('#data').html('');
   $('#header').html('');
   var type = $('#type-input').val();
+  var queryby = $.trim($('#query-by').contents()[0].textContent);
+  console.log(queryby);
   console.log("submit called");
-  $.getJSON('/similar', {type: type}, function(data) {
+  $.getJSON('/similar', {type: type, queryby: queryby}, function(data) {
 
     data.sort(function(a, b) {
       return new Date(b.date) - new Date(a.date);
@@ -130,7 +132,23 @@ function submitQuery() {
 }
 
 $().ready(function() {
-    // helper methods
+
+  $('#category').click(function() {
+    $('#query-by').contents()[0].textContent = 'category ';
+    return false;
+  });
+
+  $('#sub-category').click(function(){
+    $('#query-by').contents()[0].textContent = 'sub-category ';
+    return false;
+  });
+
+  $('#entry-text').click(function(){
+    $('#query-by').contents()[0].textContent = 'entry text ';
+    return false;
+  });
+
+  // helper method
   function split( val ) {
     return val.split(/,\s*/);
   }

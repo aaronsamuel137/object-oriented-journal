@@ -124,12 +124,19 @@ exports.data = function(req, res) {
 
 // json endpoint for entries of the same type as query
 exports.similarEntries = function(req, res) {
-  var url_parts = url.parse(req.url, true);
-  var query = url_parts.query;
+  var params = url.parse(req.url, true);
+  var query = params.query;
   var mongo_id = new ObjectId(req.session.mongo_id);
 
   dbcalls.renderSimilarEntries(mongo_id, query, res);
 };
+
+exports.fullQuery = function(req, res) {
+  var params = url.parse(req.url, true);
+  var mongo_id = new ObjectId(req.session.mongo_id);
+
+  dbcalls.renderQueryJSON(mongo_id, params, res);
+}
 
 // delete an entry from the user document and the entries collection
 exports.deleteEntry = function(req, res) {
