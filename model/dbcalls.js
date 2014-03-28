@@ -4,7 +4,6 @@
  * in one place.
  */
 
-
 // vars needed for mongo
 var mongoose = require('mongoose');
 var Entry = mongoose.model('Entry');
@@ -183,6 +182,9 @@ exports.submitEntry = function(req, res, data, type) {
   });
 }
 
+/**
+ * JSON endpoint with the entire user document for the given mongo id
+ */
 exports.renderUserJSON = function(mongo_id, res) {
   User.findOne({"_id": mongo_id}, function (err, user) {
     if (err) {
@@ -193,6 +195,10 @@ exports.renderUserJSON = function(mongo_id, res) {
   });
 }
 
+/**
+ * JSON endpoint with all entries of the same type as query for the user
+ * with the given mongo_id
+ */
 exports.renderSimilarEntries = function(mongo_id, query, res) {
   User.findOne({"_id": mongo_id}, function (err, user) {
     if (err) {
@@ -213,11 +219,18 @@ exports.renderSimilarEntries = function(mongo_id, query, res) {
   });
 }
 
+/**
+ * Delete an entry from the entries collection
+ */
 exports.deleteEntry = function(entryID) {
   var deleteEntryQuery = Entry.findOne({'_id': entryID});
   var deletePromise = deleteEntryQuery.remove().exec();
 }
 
+/**
+ * Edit an entry from the entries collection by replacing its contents
+ * with the entryData object
+ */
 exports.editEntry = function(entryID, entryData) {
   Entry.findOne({'_id': entryID}, function (err, entry) {
     if (err) {
@@ -235,6 +248,10 @@ exports.editEntry = function(entryID, entryData) {
   });
 }
 
+/**
+ * Delete an entry from the user's entry array. Remove this entry type from
+ * the symbol object if there are no more entries of this type left.
+ */
 exports.deleteEntryFromUser = function(mongo_id, entryID) {
   var deleteUsersEntry = User.findOne({'_id': mongo_id});
   var deleteUsersEntryPromise = deleteUsersEntry.exec();
@@ -292,6 +309,10 @@ exports.deleteEntryFromUser = function(mongo_id, entryID) {
   });
 }
 
+/**
+ * Edit an entry in the user's document. Update the symbol object if entry
+ * sub-category names have changed.
+ */
 exports.editEntryInUser = function(mongo_id, entryID, entryData) {
   User.findOne({'_id': mongo_id}, function (err, user) {
     if (err) {
