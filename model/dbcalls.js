@@ -183,6 +183,155 @@ exports.submitEntry = function(req, res, data, type) {
   });
 }
 
+exports.renderUserJSON = function(mongo_id, res) {
+  User.findOne({"_id": mongo_id}, function (err, user) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(user.symbol);
+    }
+  });
+}
+
+exports.renderSimilarEntries = function(mongo_id, query, res) {
+  User.findOne({"_id": mongo_id}, function (err, user) {
+    if (err) {
+      console.log('Error: %s', err);
+    } else {
+      if (user && user.entries) {
+        var queriedEntries = [];
+        user.entries.forEach(function(entry) {
+          if (entry.type == query.type) {
+            queriedEntries.push(entry);
+          }
+        });
+        res.send(queriedEntries);
+      } else {
+        res.send('');
+      }
+    }
+  });
+}
+
+exports.deleteEntry = function(entryID) {
+  var deleteEntryQuery = Entry.findOne({'_id': entryID});
+  var deletePromise = deleteEntryQuery.remove().exec();
+}
+
+exports.editEntry = function(entryID, entryData) {
+  Entry.findOne({'_id': entryID}, function (err, entry) {
+    if (err) {
+      console.log('error: %s', err);
+    } else if (entry) {
+      console.log('entry is %j', entry);
+      entry.data = entryData;
+      entry.markModified('data');
+      entry.save(function (err) {
+        if (err)
+          return;
+        console.log('Saved');
+      });
+    }
+  });
+}
+
+exports.deleteEntryFromUser = function(mongo_id, entryID) {
+  var deleteUsersEntry = User.findOne({'_id': mongo_id});
+  var deleteUsersEntryPromise = deleteUsersEntry.exec();
+
+  deleteUsersEntryPromise.then(function(doc) {
+    var modified = false;     // set to true if user document is modified
+    var stillInTypes = false; // set to true if the deleted document type still exists in the user's entries
+    var name = null;          // name of the type of the entry that is being deleted
+
+    // loop through user's entries to see if this entry is there, and delete it if it is
+    for (var i = 0; i < doc.entries.length; i++) {
+      if (doc.entries[i]._id == entryID) {
+        name = doc.entries[i].type;
+        doc.entries.splice(i, 1);
+        modified = true;
+        break;
+      }
+    }
+
+    // loop through entries again to see if this type of entry still exists.
+    // if not remove it from the symbol object
+    if (name) {
+      for (var i = 0; i < doc.entries.length; i++) {
+        if (doc.entries[i].type === name) {
+          stillInTypes = true;
+          break;
+        }
+      }
+    }
+
+    if (!stillInTypes) {
+      // remove from names array
+      var idx = doc.symbol.names.indexOf(name);
+      if (idx !== -1) {
+        doc.symbol.names.splice(idx, 1);
+        console.log('removing %s from names', name);
+      }
+
+      // remove from symbol types
+      doc.symbol.types.name = undefined;
+      doc.markModified('symbol');
+    }
+
+    // save the document if it was modified
+    if (modified) {
+      doc.save( function (err) {
+        if (err)
+          return;
+        console.log('Saved user after deleting entry');
+      });
+    }
+
+  }, function(err) {
+    console.log('Error deleting entry from user: %s', err);
+  });
+}
+
+exports.editEntryInUser = function(mongo_id, entryID, entryData) {
+  User.findOne({'_id': mongo_id}, function (err, user) {
+    if (err) {
+      console.log('Error finding user in editEntryInUser: %s', err);
+    } else if (user && user.entries) {
+
+      // loop over entry array until correct entry is found
+      for (var i = 0; i < user.entries.length; i++) {
+        if (user.entries[i]._id.equals(entryID)) {
+
+          // replace entry data with edit
+          user.entries[i].data = entryData;
+          user.markModified('entries');
+
+          // update symbol object if the sub-categories have changed for this
+          // type of entry
+          var entryType = user.entries[i].type;
+          if (user.symbol.types[entryType]) {
+            var newTypeData = [];
+            for (var key in entryData) {
+              newTypeData.push(key);
+            }
+            user.symbol.types[entryType] = newTypeData;
+            user.markModified('symbol');
+          }
+
+          user.save(function (err) {
+            if (err)
+              return;
+            console.log('Saved in user');
+          });
+          break;
+        }
+      }
+    } else {
+      console.log('User not found or has no entries');
+    }
+  });
+}
+
 function renderLogin(res, msg) {
   res.render('login', {
     title: 'Object Oriented Journal',

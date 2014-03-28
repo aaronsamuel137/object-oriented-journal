@@ -119,194 +119,49 @@ exports.logout = function(req, res) {
 // json endpoint for getting user data
 exports.data = function(req, res) {
   var mongo_id = new ObjectId(req.session.mongo_id);
-  User.findOne({"_id": mongo_id}, function (err, user) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('user is %j', user);
-      res.send(user.symbol);
-    }
-  });
+  dbcalls.renderUserJSON(mongo_id, res);
 };
 
+// json endpoint for entries of the same type as query
 exports.similarEntries = function(req, res) {
   var url_parts = url.parse(req.url, true);
   var query = url_parts.query;
   var mongo_id = new ObjectId(req.session.mongo_id);
 
-  User.findOne({"_id": mongo_id}, function (err, user) {
-    if (err) {
-      console.log('error: %s', err);
-    } else {
-      if (user && user.entries) {
-        var queriedEntries = [];
-        user.entries.forEach(function(entry) {
-          if (entry.type == query.type) {
-            queriedEntries.push(entry);
-            console.log('entry pushed');
-          }
-          console.log('entry: %j', entry);
-        });
-        res.send(queriedEntries);
-      } else {
-        res.send('');
-      }
-    }
-  });
+  dbcalls.renderSimilarEntries(mongo_id, query, res);
 };
 
+// delete an entry from the user document and the entries collection
 exports.deleteEntry = function(req, res) {
   var data = req.body;
   var entryID = data.entryID;
   var mongo_id = new ObjectId(req.session.mongo_id);
 
-  console.log('query is %j', data);
-  console.log('delete called with id %s', entryID);
+  // delete entry from entries collection
+  dbcalls.deleteEntry(entryID);
 
-  var deleteEntryQuery = Entry.findOne({'_id': entryID});
-  var deletePromise = deleteEntryQuery.remove().exec();
+  // delete entry from user's list
+  dbcalls.deleteEntryFromUser(mongo_id, entryID);
 
-  var deleteUsersEntry = User.findOne({"_id": mongo_id});
-  var deleteUsersEntryPromise = deleteUsersEntry.exec();
-
-  deleteUsersEntryPromise.then(function(doc) {
-    console.log('document is %j', doc);
-
-    var modified = false;
-    var stillInTypes = false;
-    var name = null;
-    for (var i = 0; i < doc.entries.length; i++) {
-
-      if (doc.entries[i]._id == entryID) {
-        console.log('splicing');
-        name = doc.entries[i].type;
-        doc.entries.splice(i, 1);
-        modified = true;
-        break;
-
-      } else {
-        console.log('not found');
-      }
-    }
-
-    if (name) {
-      console.log('name is %s', name);
-      for (var i = 0; i < doc.entries.length; i++) {
-        if (doc.entries[i].type === name) {
-          stillInTypes = true;
-          break;
-        }
-      }
-    }
-
-    console.log(stillInTypes);
-    console.log(modified);
-
-    if (modified) {
-      if (!stillInTypes) {
-        console.log('removing from symbol');
-
-        // remove from names array
-        var idx = doc.symbol.names.indexOf(name);
-        console.log('index is ' + idx);
-        if (idx !== -1) {
-          doc.symbol.names.splice(idx, 1);
-          console.log('removing %s from names', name);
-        }
-
-        // remove from symbol types
-        console.log('deleting... ?');
-        doc.symbol.types.name = undefined;
-
-        doc.markModified('symbol');
-        // doc.markModified('symbol.types');
-      }
-
-      doc.save( function (err) {
-        if (err)
-          return;
-        console.log('Saved');
-      });
-    }
-
-  }, function(err) {
-    console.log('error: %s', err);
-  });
-
+  // render nothing, this is just an ajax call to delete the entry
   res.send('');
 };
 
 exports.editEntry = function(req, res) {
   var data = req.body;
-  console.log('params are %j', data);
-
   var entryID = new ObjectId(data.entryID);
   delete data.entryID;
   var mongo_id = new ObjectId(req.session.mongo_id);
 
-  console.log('entry ID is ' + entryID);
+  console.log('Editing entry ID %s', entryID);
 
+  // edit entry in entries collection
+  dbcalls.editEntry(entryID, data)
 
-  Entry.findOne({'_id': entryID}, function (err, entry) {
-    if (err) {
-      console.log('error: %s', err);
-    } else if (entry) {
-      console.log('entry is %j', entry);
-      entry.data = data;
-      entry.markModified('data');
-      entry.save(function (err) {
-        if (err)
-          return;
-        console.log('Saved');
-      });
-    }
-  });
+  // edit entry in user document
+  dbcalls.editEntryInUser(mongo_id, entryID, data);
 
-  var oldEntry;
-  User.findOne({'_id': mongo_id}, function (err, user) {
-    if (err) {
-      console.log('error: %s', err);
-    } else if (user && user.entries) {
-      console.log('user found');
-
-      for (var i = 0; i < user.entries.length; i++) {
-        if (user.entries[i]._id.equals(entryID)) {
-          console.log('found entry!');
-          console.log('entry: %j', user.entries[i]);
-          oldEntry = user.entries[i];
-          user.entries[i].data = data;
-          user.markModified('entries');
-
-          var dataType = user.entries[i].type;
-
-          console.log('data type is: %j', dataType);
-          console.log('symbol type is: %j', user.symbol.types[dataType]);
-
-          if (user.symbol.types[dataType]) {
-            console.log('symbol type is: %j', user.symbol.types[dataType]);
-            var newTypeData = [];
-            for (var key in data) {
-              newTypeData.push(key);
-            }
-            console.log('newTypeData: %j', newTypeData);
-            user.symbol.types[dataType] = newTypeData;
-            user.markModified('symbol');
-          }
-
-          user.save(function (err) {
-            if (err)
-              return;
-            console.log('Saved in user');
-          });
-          break;
-        }
-      }
-
-    } else {
-      console.log('nothing happened in user findOne');
-    }
-  });
-
+  // render nothing, page refreshes on front end
   res.send('');
 }
 
