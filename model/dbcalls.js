@@ -220,19 +220,23 @@ exports.renderSimilarEntries = function(mongo_id, query, res) {
   });
 }
 
+/**
+ * JSON endpoint for querying by category, sub-category, or full-text.
+ */
 exports.renderQueryJSON = function(mongo_id, params, res) {
-  var query = params.type;
-  var queryby = params.queryby;
+  var query = params.type;       // the query string from the user
+  var queryby = params.queryby;  // the type of query (category, sub-category, or text)
   console.log('querying with query %s and queryby %s', query, queryby);
 
   var queriedEntries = [];
 
+  // query by full text
   if (queryby === 'entry text') {
-    console.log('query by text');
+    console.log('querying by text');
     var options = {
       filter: {'user': mongo_id}
     };
-    Entry.textSearch(query, function (err, output) {
+    Entry.textSearch(query, options, function (err, output) {
       if (err) {
         console.log('Error occured in text search %s', err);
       } else {
@@ -248,13 +252,13 @@ exports.renderQueryJSON = function(mongo_id, params, res) {
       res.send(queriedEntries);
     });
 
+  // query by category or sub-category
   } else {
     User.findOne({"_id": mongo_id}, function (err, user) {
       if (err) {
         console.log('Error: %s', err);
       } else {
         if (user && user.entries) {
-
 
           if (queryby === 'category') {
             console.log('query by category');
