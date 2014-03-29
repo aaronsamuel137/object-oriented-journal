@@ -173,6 +173,8 @@ $().ready(function() {
         minLength: 0,
         source: availableTags,
         select: function(event, ui) {
+          $("#type-input").val(ui.item.value);
+          submitQuery();
           return false;
         },
       })
