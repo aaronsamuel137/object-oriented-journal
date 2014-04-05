@@ -5,11 +5,13 @@ block content
   div.container
     div.row
       div.col-md-6
-        h3 Log a new entry
+        h3 Log a new entry &nbsp;&nbsp;&nbsp;&nbsp;
+          img#category-hover(src="/img/240px-Icon-round-Question_mark.jpg", width="40px")
+        p#category-info Enter a entry category here. The autocomplete feature will remember all categories you have used so far to remind you what you have journaled about in the past. Each entry must have a category.
         form#form-submit.form-horizontal(role='form', action='/new', method='post')
           div#fields
             div.form-group
-              input#type-input.form-control(name='type')
+              input#type-input.form-control(name='type' placeholder="Entry category name")
             div#inner
           div#submit
             div.form-group

@@ -11,6 +11,7 @@
   "connect": "*",
   "mongoose": "*",
   "mongoose-text-search": "*",
-  "pg": "*"
+  "pg": "*",
+  "neo4j": "*"
  }
 }

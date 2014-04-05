@@ -10,3 +10,7 @@
   margin: 25px;
   padding: 25px;
 }
+
+#category-info {
+  display: none;
+}

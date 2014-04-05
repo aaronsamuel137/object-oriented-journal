@@ -15,6 +15,9 @@ var ObjectId = mongoose.Types.ObjectId;
 var pg = require('pg');
 var connectionString = "/tmp journal"; // where the sockect connection is to postgres
 
+// vars needed for neo4j
+var neo4j = require('neo4j');
+var neo4jdb = new neo4j.GraphDatabase('http://localhost:7474');
 
 /**
  * Create a new user in the mongo database.
@@ -79,6 +82,17 @@ exports.addUserToPostgres = function(req, res, mongo_id) {
           }
         }
       );
+    }
+  });
+}
+
+exports.addUserToNeo4j = function(username) {
+  var userNode = db.createNode({name: username});
+  userNode.save(function (err, node) {
+    if (err) {
+        console.error('Error saving new node to database:', err);
+    } else {
+        console.log('Node saved to database with id:', node.id);
     }
   });
 }

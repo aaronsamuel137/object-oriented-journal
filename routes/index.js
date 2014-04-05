@@ -37,6 +37,7 @@ function addUser(req, res) {
   var username = req.body.username;
 
   var mongo_id = dbcalls.addUserToMongo(username);
+  dbcalls.addUserToNeo4j(username);
 
   // add user to postgres and render the response once complete
   dbcalls.addUserToPostgres(req, res, mongo_id);

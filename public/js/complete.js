@@ -96,6 +96,17 @@ function loadSimilar(type) {
   });
 }
 
+function setHovers() {
+  $("#category-hover").hover(
+    function () {
+      $("#category-info").show();
+    },
+    function () {
+      $("#category-info").hide();
+    }
+  );
+}
+
 $().ready(function() {
 
   // set escape key to reload page, thus reseting the new entry fields
@@ -209,5 +220,6 @@ $().ready(function() {
   $.getJSON('/data', function(data) {
     console.log(data);
     autocomplete(data);
+    setHovers();
   });
 });
