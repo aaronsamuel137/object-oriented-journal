@@ -5,6 +5,7 @@ var ObjectId = mongoose.Types.ObjectId;
 var url = require('url');
 
 var dbcalls = require('../model/dbcalls');
+var neo4j = require('../model/neo4j');
 
 var pg = require('pg');
 var connectionString = "/tmp journal"; // where the sockect connection is to postgres
@@ -37,7 +38,9 @@ function addUser(req, res) {
   var username = req.body.username;
 
   var mongo_id = dbcalls.addUserToMongo(username);
-  dbcalls.addUserToNeo4j(username);
+
+  // add user to neo4j graph
+  neo4j.addUserToNeo4j(username, mongo_id);
 
   // add user to postgres and render the response once complete
   dbcalls.addUserToPostgres(req, res, mongo_id);
@@ -68,8 +71,13 @@ exports.submit = function(req, res) {
   var type = data.type;
   delete data.type;
 
+  // get mongo id string
+  var mongoStr = req.session.mongo_id;
+
   // add new entry to database and render main page
   dbcalls.submitEntry(req, res, data, type);
+
+  neo4j.addEntryEdge(data, type, mongoStr);
 };
 
 exports.login = function(req, res) {
