@@ -30,6 +30,8 @@ html
               a(href="query") Query Journal
             li
               a(href="about") About
+            li
+              a(href="graph") Graph
 
 
           - if (name)
@@ -38,7 +40,7 @@ html
                 a(href="/logout") Logout
 
             p.navbar-text.navbar-right
-              | Signed in as&nbsp
+              | Signed in as&nbsp;
               a.navbar-link(href="#") #{name}
 
 

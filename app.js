@@ -45,6 +45,7 @@ app.get('/about', routes.about);
 app.post('/delete', routes.deleteEntry);
 app.post('/edit', routes.editEntry);
 app.get('/fullquery', routes.fullQuery);
+app.get('/graph', routes.graph);
 
 
 http.createServer(app).listen(app.get('port'), function(){

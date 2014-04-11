@@ -197,3 +197,8 @@ exports.query = function(req, res) {
 exports.about = function(req, res) {
   res.render('about');
 }
+
+exports.graph = function(req, res) {
+  var mongo_id = req.session.mongo_id;
+  neo4j.graphData(res, mongo_id);
+}

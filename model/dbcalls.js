@@ -11,6 +11,9 @@ var Entry = mongoose.model('Entry');
 var User = mongoose.model('User');
 var ObjectId = mongoose.Types.ObjectId;
 
+var neo4j = require('../model/neo4j');
+// var neo4j = require('neo4j');
+
 // vars neeed for postgres
 var pg = require('pg');
 var connectionString = "/tmp journal"; // where the sockect connection is to postgres
@@ -112,6 +115,8 @@ exports.login = function(req, res) {
             req.session.name = result.rows[0].name;
             req.session.mongo_id = result.rows[0].mongo_id;
             done();
+            // neo4j.checkAndAddUser(req.session.name, req.session.mongo_id);
+
             res.redirect('/');
           }
         }
@@ -344,7 +349,6 @@ exports.deleteEntryFromUser = function(mongo_id, entryID) {
     }
 
     // loop through entries again to see if this type of entry still exists.
-    // if not remove it from the symbol object
     if (name) {
       for (var i = 0; i < doc.entries.length; i++) {
         if (doc.entries[i].type === name) {
@@ -354,6 +358,7 @@ exports.deleteEntryFromUser = function(mongo_id, entryID) {
       }
     }
 
+    // if entry type no longer exists remove it from the symbol object
     if (!stillInTypes) {
       // remove from names array
       var idx = doc.symbol.names.indexOf(name);
@@ -365,6 +370,7 @@ exports.deleteEntryFromUser = function(mongo_id, entryID) {
       // remove from symbol types
       doc.symbol.types.name = undefined;
       doc.markModified('symbol');
+
     }
 
     // save the document if it was modified

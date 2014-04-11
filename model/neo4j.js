@@ -15,45 +15,6 @@ var queryCallback = function(err, result) {
   }
 }
 
-// var checkIfUserHasCategory = function(data, type, mongo_id) {
-//   var query = [
-//     'MATCH (user:User)-[:HAS_CATEGORY]-(cat)',
-//     'WHERE user.mongo_id = {mongo}',
-//     'RETURN user, cat'
-//   ].join('\n');
-
-//   var params = { mongo: mongo_id };
-
-//   db.query(query, params, function (err, result) {
-//     if (err) {
-//       console.error('Error:', err);
-//     } else {
-//       console.log('Neo4j query result %j:', result);
-
-//       // if user doesn't have this category, add the relationship
-//       if (result.length == 0) {
-//         var query = [
-//           'MATCH (user:User)',
-//           'WHERE user.mongo_id = {id}',
-//           'CREATE (category:Category {data}),',
-//           '(user)-[:HAS_CATEGORY]->(category)'
-//         ].join('\n');
-
-//         var params = {
-//           id: mongo_id,
-//           data: {
-//             type: type
-//           }
-//         };
-
-//         db.query(query, params, queryCallback);
-//       } else {
-//         // TODO: add sub categories to category
-//       }
-//     }
-//   });
-// }
-
 exports.addUserToNeo4j = function(username, mongo_id) {
   var query = [
     'CREATE (user:User {data})',
@@ -97,4 +58,28 @@ exports.addEntryEdge = function(data, type, mongo_id) {
   };
 
   db.query(query, params, queryCallback);
+}
+
+/*
+ * Send JSON data for all connections to a given user (categories and subcategories of entries)
+ */
+exports.graphData = function(res, mongo_id) {
+  // var query = 'MATCH n RETURN n';
+  // var params = {};
+
+  var query = [
+    'MATCH (user:User)-[:HAS_CATEGORY]->(cat:Category)-[:HAS_SUBCATEGORY]->(subcat)',
+    'WHERE user.mongo_id = {id}',
+    'RETURN user, cat, subcat'
+  ].join('\n');
+
+  var params = { id: mongo_id };
+
+  db.query(query, params, function (err, result) {
+    if (err)
+      console.log("error in neo4j query!");
+    else {
+      res.send(result);
+    }
+  });
 }
