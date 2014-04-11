@@ -46,7 +46,7 @@ app.post('/delete', routes.deleteEntry);
 app.post('/edit', routes.editEntry);
 app.get('/fullquery', routes.fullQuery);
 app.get('/graph', routes.graph);
-
+app.get('/graphdata', routes.graphData);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

@@ -15,7 +15,8 @@ function renderHome(req, res, msg) {
   res.render('index', {
     title: 'Object Oriented Journal',
     name: req.session.name,
-    msg: msg
+    msg: msg,
+    script: []
   });
 }
 
@@ -23,7 +24,7 @@ function renderNewEntry(req, res) {
   res.render('new', {
     title: 'Object Oriented Journal',
     name: req.session.name,
-    script: '/js/complete.js',
+    script: ['/js/complete.js']
   });
 }
 
@@ -31,6 +32,7 @@ function renderLogin(res, msg) {
   res.render('login', {
     title: 'Object Oriented Journal',
     message: msg,
+    script: []
   });
 }
 
@@ -198,7 +200,19 @@ exports.about = function(req, res) {
   res.render('about');
 }
 
-exports.graph = function(req, res) {
+exports.graphData = function(req, res) {
   var mongo_id = req.session.mongo_id;
   neo4j.graphData(res, mongo_id);
+}
+
+exports.graph = function(req, res) {
+  if (!req.session.name) {
+    res.redirect('/login');
+  } else {
+    res.render('graph', {
+      title: 'Object Oriented Journal',
+      name: req.session.name,
+      script: ['/js/graph.js', 'http://d3js.org/d3.v3.min.js']
+    });
+  }
 }

@@ -435,6 +435,7 @@ function renderLogin(res, msg) {
   res.render('login', {
     title: 'Object Oriented Journal',
     message: msg,
+    script: []
   });
 }
 
@@ -442,7 +443,8 @@ function renderHome(req, res, msg) {
   res.render('index', {
     title: 'Object Oriented Journal',
     name: req.session.name,
-    msg: msg
+    msg: msg,
+    script: []
   });
 }
 

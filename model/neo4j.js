@@ -68,9 +68,9 @@ exports.graphData = function(res, mongo_id) {
   // var params = {};
 
   var query = [
-    'MATCH (user:User)-[:HAS_CATEGORY]->(cat:Category)-[:HAS_SUBCATEGORY]->(subcat)',
+    'MATCH (user:User)-[r1:HAS_CATEGORY]->(cat:Category)-[r2:HAS_SUBCATEGORY]->(subcat)',
     'WHERE user.mongo_id = {id}',
-    'RETURN user, cat, subcat'
+    'RETURN user, cat, subcat, r1, r2'
   ].join('\n');
 
   var params = { id: mongo_id };

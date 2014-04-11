@@ -9,8 +9,8 @@ html
     script( type="text/javascript", src="//code.jquery.com/jquery-1.10.1.min.js" )
     script( type="text/javascript", src="//code.jquery.com/ui/1.10.4/jquery-ui.js" )
     script( type="text/javascript", src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" )
-    - if (script)
-      script(src=script)
+    - for (var i = 0; i < script.length; i++)
+      script(src=script[i])
 
   body
     nav.navbar.navbar-default.navbar-static-top(role="navigation")
