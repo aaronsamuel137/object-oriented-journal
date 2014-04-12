@@ -191,7 +191,7 @@ exports.query = function(req, res) {
     res.render('query', {
       title: 'Object Oriented Journal',
       name: req.session.name,
-      script: '/js/query.js',
+      script: ['/js/query.js'],
     });
   }
 }
