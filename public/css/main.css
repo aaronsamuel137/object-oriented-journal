@@ -21,11 +21,11 @@ path.link {
   stroke-width: 1.5px;
 }
 
-marker#licensing {
+marker#has_category {
   fill: green;
 }
 
-path.link.licensing {
+path.link.has_category {
   stroke: green;
 }
 
@@ -40,7 +40,7 @@ circle {
 }
 
 text {
-  font: 10px sans-serif;
+  font: 1em sans-serif;
   pointer-events: none;
 }
 

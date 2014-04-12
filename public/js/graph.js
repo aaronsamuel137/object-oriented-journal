@@ -2,24 +2,28 @@ $().ready(function() {
   $.getJSON('/graphdata', function(data) {
 
     var links = [];
+    var username, category, subcategory;
+    var prevCategory = 'null';
     for (var i = 0; i < data.length; i++) {
 
-      var username = data[i].user._data.data.name;
-      var category = data[i].cat._data.data.type;
-      var subcategory = data[i].subcat._data.data.type;
+      username = data[i].user._data.data.name;
+      category = data[i].cat._data.data.type;
+      subcategory = data[i].subcat._data.data.type;
 
-      if (i == 0) {
+      if (category !== prevCategory) {
         links.push({
           source: username,
           target: category,
-          type: 'has category'
+          type: 'has_category'
         });
       }
+
+      prevCategory = category;
 
       links.push({
         source: category,
         target: subcategory,
-        type: 'has sub-category'
+        type: 'has_sub-category'
       });
 
     }
@@ -76,7 +80,7 @@ function makeGraph(links) {
 
   // Per-type markers, as they don't inherit styles.
   svg.append("svg:defs").selectAll("marker")
-      .data(["suit", "licensing", "resolved"])
+      .data(["has_category", "has_sub-category"])
     .enter().append("svg:marker")
       .attr("id", String)
       .attr("viewBox", "0 -5 10 10")
