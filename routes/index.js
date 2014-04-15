@@ -197,7 +197,9 @@ exports.query = function(req, res) {
 }
 
 exports.about = function(req, res) {
-  res.render('about');
+  res.render('about', {
+    script: []
+  });
 }
 
 exports.graphData = function(req, res) {
