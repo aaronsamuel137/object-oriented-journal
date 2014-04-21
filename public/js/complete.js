@@ -61,7 +61,10 @@ function toRowID(string) {
 }
 
 function loadSimilar(type) {
+  // get a list of similar journal entries in JSON format
   $.getJSON('/similar', {type: type}, function(data) {
+
+    // sort data by date field
     data.sort(function(a, b) {
       return new Date(b.date) - new Date(a.date);
     });
@@ -141,10 +144,6 @@ $().ready(function() {
       .autocomplete({
         position: {my: "left top", at: "right top"},
         minLength: 0,
-        // source: function(request, response) {
-        //   // delegate back to autocomplete, but extract the last term
-        //   response($.ui.autocomplete.filter(availableTags, extractLast(request.term)));
-        // },
         source: availableTags,
         select: function(event, ui) {
           selectCalled = true;
@@ -217,6 +216,7 @@ $().ready(function() {
       // });
   }
 
+  // get the users data a json and use it to populate the automcomplete widget
   $.getJSON('/data', function(data) {
     console.log(data);
     autocomplete(data);

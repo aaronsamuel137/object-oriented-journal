@@ -31,7 +31,9 @@ $().ready(function() {
   });
 });
 
-
+/*
+ * The following code is adapted from http://jsfiddle.net/7HZcR/3/
+ */
 function makeGraph(links) {
 
   //sort links by source, then target

@@ -1,3 +1,8 @@
+/*
+ * Edit a journal entry on the front-end by manipulating DOM elements.
+ * These edits are pushed to the database when the "Submit Edit" button
+ * is clicked.
+ */
 function editEntry(itemNum) {
   var item = $('#item' + itemNum);
   var itemId = item.find('.invisible').text();
@@ -44,8 +49,10 @@ function editEntry(itemNum) {
     '</div>');
 }
 
+/*
+ * Push edits to the database and reload the page
+ */
 function submitEdit(itemNum) {
-  console.log('edit called with ' + itemNum);
   var item = $('#item' + itemNum);
   var itemId = item.find('.invisible').text();
   var numKeys = item.find($('i')).length;
@@ -66,6 +73,10 @@ function submitEdit(itemNum) {
     });
 }
 
+/*
+ * Delete an entry from the database and the current view. Can't be undone.
+ * In the future, maybe add an "Are you sure?" dialog.
+ */
 function deleteEntry(itemNum) {
   var item = $('#item' + itemNum);
   var itemId = item.find('.invisible').text();
@@ -73,15 +84,25 @@ function deleteEntry(itemNum) {
   item.html('');
 }
 
+/*
+ * Submit a query, searching for certain kinds of journal entries.
+ * Can query by category, sub-category, or full text.
+ */
 function submitQuery() {
+  // remove any html from previous queries
   $('#data').html('');
   $('#header').html('');
+
+  // type is the query text
   var type = $('#type-input').val();
+
+  // queryby is either "category", "sub-category", or "entry text"
   var queryby = $.trim($('#query-by').contents()[0].textContent);
-  console.log(queryby);
-  console.log("submit called");
+
+  // get entries in JSON format from the database
   $.getJSON('/fullquery', {type: type, queryby: queryby}, function(data) {
 
+    // sort any returned entries by date
     data.sort(function(a, b) {
       return new Date(b.date) - new Date(a.date);
     });
@@ -90,6 +111,7 @@ function submitQuery() {
     var itemNum = 0;
     var innerType = type;
 
+    // add html for every entry to the page
     data.forEach(function(entry) {
 
       if (entry.data) {
