@@ -7,6 +7,26 @@ programming, where each entry has a category (class), and sub-categories (attrib
 The idea is to give more structure to the act of journaling. This project is
 really an experiment to see if there is any value in this approach or not.
 
+Build Instructions
+==================
+
+Developed under OSX. Requires installations of Postgres, MongoDB, and Neo4j in
+order to be run locally. Works with the default settings of Postgres.app, and
+homebrew installations of mongodb and neo4j.
+
+To install the dependency nodejs modules, run
+
+```
+npm install
+```
+
+To run on localhost, first ensure that the the database servers are running on
+their default ports. Then start the app running with
+
+```
+node app.js
+```
+
 
 Motivating Ideas
 ================
