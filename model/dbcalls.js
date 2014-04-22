@@ -16,8 +16,8 @@ var neo4j = require('../model/neo4j');
 
 // vars neeed for postgres
 var pg = require('pg');
-var connectionString = "/tmp journal"; // where the sockect connection is to postgres
-
+// var connectionString = "/tmp journal"; // where the sockect connection is to postgres
+var connectionString = "postgresql://localhost/journal";
 
 /**
  * Create a new user in the mongo database.
