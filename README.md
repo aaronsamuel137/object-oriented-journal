@@ -20,6 +20,13 @@ To install the dependency nodejs modules, run
 npm install
 ```
 
+To set up the postgres database, run:
+
+```
+createdb journal
+psql -d journal -a -f create_table.sql
+```
+
 To run on localhost, first ensure that the the database servers are running on
 their default ports. Then start the app running with
 
